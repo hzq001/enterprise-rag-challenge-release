@@ -1,0 +1,398 @@
+[
+ {
+  "question_text": "For Ziff Davis, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 4400,
+  "references": [
+   [
+    "ziff davis",
+    10
+   ]
+  ],
+  "_note": "10-K Human Capital: approximately 4,400 employees as of Dec 31 2022"
+ },
+ {
+  "question_text": "For Aurora Innovation, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 1700,
+  "references": [
+   [
+    "aurora",
+    16
+   ]
+  ],
+  "_note": "10-K: approx 1,700 employees as of Dec 31 2022"
+ },
+ {
+  "question_text": "For Bionano Genomics, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 405,
+  "references": [
+   [
+    "bionano",
+    26
+   ]
+  ],
+  "_note": "10-K Human Capital: 405 employees as of Dec 31 2022"
+ },
+ {
+  "question_text": "For MainStreet Bancshares, Inc., what was the Earnings per common share (basic and diluted) for 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 3.26,
+  "references": [
+   [
+    "mainstreet",
+    41
+   ]
+  ],
+  "_note": "Per share data: EPS basic and diluted 2022 = 3.26"
+ },
+ {
+  "question_text": "For Kelly Partners Group Holdings Limited, what was the FY2022 Revenue (in AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 64862110,
+  "references": [
+   [
+    "kelly partners",
+    10
+   ]
+  ],
+  "_note": "FY22 Revenue 64,862,110 AUD"
+ },
+ {
+  "question_text": "For Mosaic Brands Limited, what was the Total revenue and other income for the year ended 2 July 2022 (in thousands of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 619651,
+  "references": [
+   [
+    "mosaic brands",
+    61
+   ]
+  ],
+  "_note": "Total revenue and other income 2022 = 619,651 (000 AUD)"
+ },
+ {
+  "question_text": "For Brave Bison Group plc, what was the Total equity as at 31 December 2022 (in thousands of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 10022,
+  "references": [
+   [
+    "brave bison",
+    37
+   ]
+  ],
+  "_note": "Total equity 2022 = 10,022 (000 GBP)"
+ },
+ {
+  "question_text": "For MGM Resorts International, what was the Net income (loss) for 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 206731,
+  "references": [
+   [
+    "mgm",
+    64
+   ]
+  ],
+  "_note": "Net income (loss) 2022 = 206,731 (000 USD), read via vision (garbled text)"
+ },
+ {
+  "question_text": "For Downer EDI Limited, what was the Total borrowings as at 30 June 2022 (in millions of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 1361.7,
+  "references": [
+   [
+    "downer",
+    98
+   ]
+  ],
+  "_note": "Total borrowings 2022 = 1,361.7m AUD"
+ },
+ {
+  "question_text": "For AA Limited, what was the Group revenue for the year ended 31 March 2022 (in millions of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 989,
+  "references": [
+   [
+    "aa limited",
+    12
+   ]
+  ],
+  "_note": "Group revenue 2022 = 989m GBP"
+ },
+ {
+  "question_text": "For Trinity Place Holdings Inc., what was the value of Cloud storage capacity (TB) at the end of the period listed in the annual report? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": "N/A",
+  "references": [
+   [
+    "trinity place",
+    19
+   ]
+  ],
+  "_note": "No cloud storage capacity data; cloud only refers to Cloud Club amenity"
+ },
+ {
+  "question_text": "For Atreca, Inc., what was the Gross margin (%) according to the annual report? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": "N/A",
+  "references": [
+   [
+    "atreca",
+    26
+   ]
+  ],
+  "_note": "Pre-revenue biotech; no gross margin disclosed"
+ },
+ {
+  "question_text": "For Pintec Technology Holdings Limited, what was the Dividend per share (in AUD) for the year? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": "N/A",
+  "references": [
+   [
+    "pintec",
+    12
+   ]
+  ],
+  "_note": "No dividends paid; no plan to pay"
+ },
+ {
+  "question_text": "For Terns Pharmaceuticals, Inc., what was the Total revenue (in USD) for the year ended December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 0,
+  "references": [
+   [
+    "terns",
+    127
+   ]
+  ],
+  "_note": "License revenue 2022 =  (table shows dash); total revenue 0"
+ },
+ {
+  "question_text": "For Commerzbank, what was the Total assets as at 31 December 2022 (in billions of EUR)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 477.4,
+  "references": [
+   [
+    "commerzbank",
+    2
+   ]
+  ],
+  "_note": "Total assets 2022 = 477.4 €bn"
+ },
+ {
+  "question_text": "For Datalogic, what was the Total revenue for the year ended 31 December 2022 (in thousands of EUR)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 654632,
+  "references": [
+   [
+    "datalogic",
+    44
+   ]
+  ],
+  "_note": "Total revenue 2022 = 654,632 thousand EUR"
+ },
+ {
+  "question_text": "Did Duni Group announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "duni",
+    35
+   ]
+  ],
+  "_note": "Dividend policy unchanged (long-term intention >=40%); only annual dividend proposal"
+ },
+ {
+  "question_text": "Did Structural Monitoring Systems Plc report any changes to its capital structure in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "structural",
+    7
+   ]
+  ],
+  "_note": "Rights Issue completed Apr 2022 (.91m) + Placement (.93m): capital structure change"
+ },
+ {
+  "question_text": "Did Poste Italiane announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "poste",
+    38
+   ]
+  ],
+  "_note": "AGM 27 May 2022 authorised buyback; programme concluded 30May-13Jun 2022"
+ },
+ {
+  "question_text": "Did RWE AG mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "rwe",
+    7
+   ]
+  ],
+  "_note": "RWE acquired Con Edison Clean Energy Businesses (US.8bn); also Alpha Solar/JBM Solar/Magnum"
+ },
+ {
+  "question_text": "Did Guaranty Bancshares, Inc. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "guaranty",
+    3
+   ]
+  ],
+  "_note": "Only described repurchasing 2% in CEO letter; no buyback plan announced"
+ },
+ {
+  "question_text": "Did archTIS Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "archtis",
+    21
+   ]
+  ],
+  "_note": "no ESG initiatives; only env-regulation disclaimer"
+ },
+ {
+  "question_text": "Did INMUNE BIO INC. announce any new product launches in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "inmune",
+    3
+   ]
+  ],
+  "_note": "clinical-stage; no product launch, only develop/commercialize objectives"
+ },
+ {
+  "question_text": "Did NuCana plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "nucana",
+    55
+   ]
+  ],
+  "_note": "no substantive M&A; only risk-factor/possibility/historical mentions"
+ },
+ {
+  "question_text": "Did Incyte Corporation announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "incyte",
+    60
+   ]
+  ],
+  "_note": "no buyback; treasury only as securities investment"
+ },
+ {
+  "question_text": "Did Playtech plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "playtech",
+    21
+   ]
+  ],
+  "_note": "Finalto sale completed July 2022 (.1m); M&A activity mentioned"
+ },
+ {
+  "question_text": "Which leadership positions changed at AA Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Non-Executive Director",
+  "references": [
+   [
+    "aa limited",
+    28
+   ]
+  ],
+  "_note": "Kory Sorenson appointed NED, joined Topco Board 1 Feb 2022"
+ },
+ {
+  "question_text": "Which leadership positions changed at Sonic Automotive, Inc. in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Chairman",
+  "references": [
+   [
+    "sonic",
+    11
+   ]
+  ],
+  "_note": "David Bruton Smith elected Chairman of the Board July 2022"
+ },
+ {
+  "question_text": "Which leadership positions changed at Rectifier Technologies Ltd in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Company Secretary",
+  "references": [
+   [
+    "rectifier",
+    8
+   ]
+  ],
+  "_note": "Nova Taylor appointed Company Secretary 3 Feb 2022; Stedwell resigned"
+ },
+ {
+  "question_text": "Which leadership positions changed at SThree plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Non-Executive Director",
+  "references": [
+   [
+    "sthree",
+    12
+   ]
+  ],
+  "_note": "Elaine ODonnell appointed Audit & Risk Committee Chair and NED Oct 2022; Imogen Joss NED eff 1 Dec 2022"
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc, RWE AG, Commerzbank - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "Commerzbank",
+  "references": [
+   [
+    "commerzbank",
+    273
+   ]
+  ],
+  "_note": "employees: DL 3069, Duni 2231, Incyte 2324, PT 7000, RWE 18310, CBK 42378 -> highest CBK"
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc, RWE AG - which company reported the lowest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "Duni",
+  "references": [
+   [
+    "duni",
+    4
+   ]
+  ],
+  "_note": "lowest among DL3069/Duni2231/Incyte2324/PT7000/RWE18310 -> Duni 2231"
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "Playtech",
+  "references": [
+   [
+    "playtech",
+    6
+   ]
+  ],
+  "_note": "highest among DL3069/Duni2231/Incyte2324/PT7000 -> Playtech ~7000"
+ }
+]

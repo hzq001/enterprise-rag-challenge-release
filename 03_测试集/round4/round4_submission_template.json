@@ -1,0 +1,200 @@
+[
+ {
+  "question_text": "For CoreCard Corporation, what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Franklin Covey Co., what was the Net sales for the fiscal year ended August 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For FNCB Bancorp, Inc., what was the Total revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Ritchie Bros. Auctioneers Incorporated, what was the Total revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Albany International Corp., what was the Net sales for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Seiko Epson Corporation, what was the Total revenue for the fiscal year ended March 31, 2022 (in millions of JPY)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For SIG plc, what was the Revenue for the year ended December 31, 2022 (in millions of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For FNCB Bancorp, Inc., what was the Total assets as at December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For 1-800-FLOWERS.COM, INC., what was the Net revenues for the fiscal year ended July 3, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For BetMakers Technology Group Ltd, what was the Total revenue for the fiscal year ended June 30, 2022 (in thousands of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For James Halstead plc, what was the Revenue for the year ended June 30, 2022 (in thousands of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Elixir Energy Limited, what was the Total revenue for the fiscal year ended June 30, 2022 (in AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For abrdn Japan Investment Trust plc, what was the total number of employees at the end of the reporting period? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Armadale Capital Plc, what was the Total revenue for the year ended December 31, 2022 (in GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Ocugen, Inc., what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Kiniksa Pharmaceuticals, Ltd., what was the Gross margin (%) according to the annual report? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Medallion Financial Corp. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Ritchie Bros. Auctioneers Incorporated mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Ziff Davis, Inc. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Franklin Covey Co. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Downer EDI Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did James Halstead plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Toshiba Corporation announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Peako Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did BetMakers Technology Group Ltd announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did 1-800-FLOWERS.COM, INC. announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at BetMakers Technology Group Ltd in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at Franklin Covey Co. in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at CoreCard Corporation in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at Brave Bison Group plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - Poste Italiane, Commerzbank, RWE AG, Playtech plc - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - SThree plc, Brave Bison Group plc, James Halstead plc, Armadale Capital Plc - which company reported the lowest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - AA Limited, SThree plc, Brave Bison Group plc, James Halstead plc - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ }
+]

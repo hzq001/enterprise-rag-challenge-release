@@ -1,0 +1,1210 @@
+[
+  {
+    "question_text": "For Ziff Davis, Inc., what was the value of Cloud storage capacity (TB) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Ziff Davis",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Liberty Broadband Corporation announce a share buyback plan in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Liberty Broadband",
+        89
+      ]
+    ]
+  },
+  {
+    "question_text": "What is the total number of employees let go by Pintec Technology Holdings Limited according to the annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Pintec",
+        36
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Westwater Resources, Inc. in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "President and Chief Executive Officer",
+    "references": [
+      [
+        "Westwater",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Brave Bison Group plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Brave Bison",
+        31
+      ],
+      [
+        "Brave Bison",
+        8
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Cash flow from operations (in USD) for Sonic Automotive, Inc.  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "406100000",
+    "references": [
+      [
+        "Sonic Automotive",
+        71
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Poste Italiane announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Poste Italiane",
+        35
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of MGM Resorts International on executive compensation in USD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "MGM Resorts",
+        3
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Gross margin (%) for INMUNE BIO INC. according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "INMUNE BIO",
+        49
+      ]
+    ]
+  },
+  {
+    "question_text": "Did BetMakers Technology Group Ltd mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "BetMakers",
+        68
+      ]
+    ]
+  },
+  {
+    "question_text": "For Franklin Covey Co., what was the value of Year-end box office market share (if applicable) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Franklin Covey",
+        15
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Downer EDI Limited announce a share buyback plan in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Downer EDI",
+        14
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Gross margin (%) for Armadale Capital Plc according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Armadale Capital",
+        22
+      ]
+    ]
+  },
+  {
+    "question_text": "Did AA Limited announce any new product launches in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "AA Limited",
+        13
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Franklin Covey Co. outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Franklin Covey",
+        15
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of Ocugen, Inc. on executive compensation in AUD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Ocugen",
+        1
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Bionano Genomics, Inc. mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Bionano Genomics",
+        111
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Seiko Epson Corporation announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "Seiko Epson",
+        67
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Number of hotels at year-end of MGM Resorts International at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "MGM Resorts",
+        3
+      ]
+    ]
+  },
+  {
+    "question_text": "What is the total number of employees let go by NZME Limited according to the annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "NZME",
+        64
+      ]
+    ]
+  },
+  {
+    "question_text": "For Incyte Corporation, what was the value of Clinical trial sites operating at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Incyte",
+        69
+      ]
+    ]
+  },
+  {
+    "question_text": "For Aurora Innovation, Inc., what was the value of Number of patents at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "1300",
+    "references": [
+      [
+        "Aurora Innovation",
+        14
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total assets in EUR at the end of the period listed in annual report: \"Datalogic\", \"Terns Pharmaceuticals, Inc.\", \"Incyte Corporation\", \"INMUNE BIO INC.\", \"Duni Group\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        72
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "What is the total number of employees let go by Downer EDI Limited according to the annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Downer EDI",
+        73
+      ],
+      [
+        "Downer EDI",
+        96
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total revenue in EUR at the end of the period listed in annual report: \"Atreca, Inc.\", \"Poste Italiane\", \"Datalogic\", \"NuCana plc\", \"RWE AG\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        6
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "What was the value of Total power generation capacity (MW) of Elixir Energy Limited at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Elixir Energy",
+        4
+      ],
+      [
+        "Elixir Energy",
+        8
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Number of active pharmaceutical patents of Kiniksa Pharmaceuticals, Ltd. at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Kiniksa",
+        89
+      ],
+      [
+        "Kiniksa",
+        90
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Total deposits at year-end of CoreCard Corporation at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "CoreCard",
+        25
+      ],
+      [
+        "CoreCard",
+        26
+      ]
+    ]
+  },
+  {
+    "question_text": "For HCA Healthcare, Inc., what was the value of Outstanding insurance claims (if applicable) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "HCA",
+        55
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Datalogic in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "Director",
+    "references": [
+      [
+        "Datalogic",
+        38
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Incitec Pivot Limited mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Incitec Pivot",
+        8
+      ],
+      [
+        "Incitec Pivot",
+        15
+      ]
+    ]
+  },
+  {
+    "question_text": "For Franklin Covey Co., what was the value of Number of active licensing deals at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Franklin Covey",
+        89
+      ],
+      [
+        "Franklin Covey",
+        119
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Cash flow from operations (in USD) for Wheeler Real Estate Investment Trust, Inc.  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 30758000,
+    "references": [
+      [
+        "Wheeler Real Estate",
+        40
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Incitec Pivot Limited announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Incitec Pivot",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of archTIS Limited on executive compensation in USD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "archTIS",
+        25
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Guaranty Bancshares, Inc. announce any new product launches in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "Guaranty Bancshares",
+        1
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Cash flow from operations (in GBP) for AA Limited  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 214000000,
+    "references": [
+      [
+        "AA Limited",
+        37
+      ]
+    ]
+  },
+  {
+    "question_text": "For Peako Limited, what was the value of Cloud storage capacity (TB) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Peako",
+        1
+      ],
+      [
+        "Peako",
+        11
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Total revenue (in USD) for Medallion Financial Corp.  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 196621000,
+    "references": [
+      [
+        "Medallion Financial",
+        71
+      ]
+    ]
+  },
+  {
+    "question_text": "Did AA Limited report any changes to its capital structure? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "AA Limited",
+        12
+      ],
+      [
+        "AA Limited",
+        14
+      ],
+      [
+        "AA Limited",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "What is the total number of employees let go by KP Tissue Inc. according to the annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "KP Tissue",
+        19
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total revenue in EUR at the end of the period listed in annual report: \"Atreca, Inc.\", \"Poste Italiane\", \"Datalogic\", \"Duni Group\", \"Incyte Corporation\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        6
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "Which leadership positions changed at Blue Apron Holdings, Inc. in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "Chief Supply Chain Officer",
+    "references": [
+      [
+        "Blue Apron",
+        27
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Dividend per share (in USD) for Ritchie Bros. Auctioneers Incorporated according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "0.27",
+    "references": [
+      [
+        "Ritchie Bros",
+        38
+      ]
+    ]
+  },
+  {
+    "question_text": "What are the names of new products launched by Albany International Corp. as mentioned in the annual report?",
+    "kind": "names",
+    "value": "N/A",
+    "references": [
+      [
+        "Albany International",
+        15
+      ],
+      [
+        "Albany International",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "For Sonic Automotive, Inc., what was the value of Number of hybrid models available at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Sonic Automotive",
+        18
+      ],
+      [
+        "Sonic Automotive",
+        25
+      ]
+    ]
+  },
+  {
+    "question_text": "Did ACRES Commercial Realty Corp. outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "ACRES Commercial Realty",
+        4
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Generic product count of Kiniksa Pharmaceuticals, Ltd. at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Kiniksa",
+        1
+      ],
+      [
+        "Kiniksa",
+        7
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Number of fulfillment centers at year-end of 1-800-FLOWERS.COM, INC. at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "1-800-FLOWERS",
+        31
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of Kiniksa Pharmaceuticals, Ltd. on executive compensation in USD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Kiniksa",
+        1
+      ],
+      [
+        "Kiniksa",
+        7
+      ]
+    ]
+  },
+  {
+    "question_text": "For Origin Bancorp, Inc., what was the value of Total assets on balance sheet at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 9686067000,
+    "references": [
+      [
+        "Origin Bancorp",
+        6
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Ritchie Bros. Auctioneers Incorporated mention any ongoing litigation or regulatory inquiries? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Ritchie Bros",
+        37
+      ],
+      [
+        "Ritchie Bros",
+        28
+      ]
+    ]
+  },
+  {
+    "question_text": "What is the total number of employees let go by Commerzbank according to the annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 9000,
+    "references": [
+      [
+        "Commerzbank",
+        91
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total assets in EUR at the end of the period listed in annual report: \"Poste Italiane\", \"NuCana plc\", \"Incyte Corporation\", \"INMUNE BIO INC.\", \"Atreca, Inc.\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Poste Italiane",
+    "references": [
+      [
+        "Poste Italiane",
+        20
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "For HCA Healthcare, Inc., what was the value of Number of managed clinics at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "HCA",
+        5
+      ],
+      [
+        "HCA",
+        6
+      ]
+    ]
+  },
+  {
+    "question_text": "For RWE AG, what was the value of Number of facilities at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "RWE",
+        3
+      ],
+      [
+        "RWE",
+        43
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest net income in EUR at the end of the period listed in annual report: \"Atreca, Inc.\", \"INMUNE BIO INC.\", \"Datalogic\", \"NuCana plc\", \"RWE AG\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        41
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "For Albany International Corp., what was the value of R&D spending on advanced programs at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "31400000",
+    "references": [
+      [
+        "Albany International",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "For Rectifier Technologies Ltd, what was the value of Number of patents at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Rectifier Technologies",
+        7
+      ]
+    ]
+  },
+  {
+    "question_text": "For Albany International Corp., what was the value of Year-end patent portfolio (aerospace tech) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "2300",
+    "references": [
+      [
+        "Albany International",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest net income in EUR at the end of the period listed in annual report: \"Datalogic\", \"NuCana plc\", \"Duni Group\", \"Playtech plc\", \"Atreca, Inc.\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        41
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "For SThree plc, what was the value of End-of-year total headcount at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "3119",
+    "references": [
+      [
+        "SThree",
+        4
+      ],
+      [
+        "SThree",
+        25
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total assets in EUR at the end of the period listed in annual report: \"Playtech plc\", \"Datalogic\", \"Duni Group\", \"Poste Italiane\", \"Incyte Corporation\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        72
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "For HCA Healthcare, Inc., what was the value of Number of healthcare professionals on staff at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "294000",
+    "references": [
+      [
+        "HCA",
+        3
+      ]
+    ]
+  },
+  {
+    "question_text": "For SIG plc, what was the value of Number of stores at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "SIG",
+        1
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Kelly Partners Group Holdings Limited in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "Non-Executive Independent Director",
+    "references": [
+      [
+        "Kelly Partners",
+        3
+      ],
+      [
+        "Kelly Partners",
+        84
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Trinity Place Holdings Inc. mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "Trinity Place",
+        5
+      ],
+      [
+        "Trinity Place",
+        23
+      ]
+    ]
+  },
+  {
+    "question_text": "For FNCB Bancorp, Inc., what was the value of Non-performing loan ratio (NPL) at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 0.25,
+    "references": [
+      [
+        "FNCB",
+        54
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Elixir Energy Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "Elixir Energy",
+        10
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Year-end user base of archTIS Limited at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "archTIS",
+        12
+      ],
+      [
+        "archTIS",
+        13
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of MainStreet Bancshares, Inc. on executive compensation in USD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "MainStreet Bancshares",
+        1
+      ],
+      [
+        "MainStreet Bancshares",
+        12
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Capital expenditures (in USD) for Structural Monitoring Systems Plc according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Structural Monitoring",
+        28
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Capital expenditures (in EUR) for INMUNE BIO INC. according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "INMUNE BIO",
+        1
+      ],
+      [
+        "INMUNE BIO",
+        25
+      ]
+    ]
+  },
+  {
+    "question_text": "What is the name of the last product launched by 1-800-FLOWERS.COM, INC. as mentioned in the annual report?",
+    "kind": "name",
+    "value": "N/A",
+    "references": [],
+    "_note": "_note_na"
+  },
+  {
+    "question_text": "For Peako Limited, what was the value of Year-end customer base at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Peako",
+        4
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Cash flow from operations (in USD) for FNCB Bancorp, Inc.  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 19970000,
+    "references": [
+      [
+        "FNCB",
+        71
+      ]
+    ]
+  },
+  {
+    "question_text": "For Peako Limited, what was the value of Total expensed R&D expenditure at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Peako",
+        52
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Empire Company Limited announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Empire",
+        7
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Duni Group in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "Chairman of the Board of Directors,EVP",
+    "references": [
+      [
+        "Duni",
+        10
+      ],
+      [
+        "Duni",
+        13
+      ]
+    ]
+  },
+  {
+    "question_text": "Did SIG plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "SIG",
+        9
+      ]
+    ]
+  },
+  {
+    "question_text": "For Pintec Technology Holdings Limited, what was the value of End-of-year net interest margin (NIM) at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Pintec",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "For AA Limited, what was the value of Fleet size (vehicles) at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "AA Limited",
+        5
+      ]
+    ]
+  },
+  {
+    "question_text": "Did HCA Healthcare, Inc. announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "HCA",
+        3
+      ]
+    ]
+  },
+  {
+    "question_text": "Which of the companies had the lowest total assets in EUR at the end of the period listed in annual report: \"Incyte Corporation\", \"INMUNE BIO INC.\", \"Datalogic\", \"Terns Pharmaceuticals, Inc.\", \"RWE AG\"? If data for the company is not available, exclude it from the comparison. If only one company is left, return this company.",
+    "kind": "name",
+    "value": "Datalogic",
+    "references": [
+      [
+        "Datalogic",
+        72
+      ]
+    ],
+    "_note": "name题修正: EUR口径剔除USD/SEK公司"
+  },
+  {
+    "question_text": "What was the value of E-commerce active customer accounts of Mosaic Brands Limited at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Mosaic Brands",
+        8
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the largest single spending of Toshiba Corporation on executive compensation in AUD? If data is not available in this currency, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Toshiba",
+        68
+      ]
+    ]
+  },
+  {
+    "question_text": "For Sonic Automotive, Inc., what was the value of Year-end fleet average CO₂ emissions at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Sonic Automotive",
+        25
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Wheeler Real Estate Investment Trust, Inc. report any changes to its capital structure? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Wheeler Real Estate",
+        6
+      ],
+      [
+        "Wheeler Real Estate",
+        16
+      ]
+    ]
+  },
+  {
+    "question_text": "For Atreca, Inc., what was the value of Number of managed clinics at year-end at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Atreca",
+        4
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Crombie REIT in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "N/A",
+    "references": [
+      [
+        "Crombie REIT",
+        6
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Mosaic Brands Limited mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Mosaic Brands",
+        40
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Incitec Pivot Limited detail any restructuring plans in the latest filing? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": true,
+    "references": [
+      [
+        "Incitec Pivot",
+        94
+      ],
+      [
+        "Incitec Pivot",
+        10
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of Number of active software licenses of Rapid7 at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Rapid7",
+        2
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Wheeler Real Estate Investment Trust, Inc. in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "N/A",
+    "references": [
+      [
+        "Wheeler Real Estate",
+        6
+      ]
+    ]
+  },
+  {
+    "question_text": "Did Aptevo Therapeutics Inc. mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+    "kind": "boolean",
+    "value": false,
+    "references": [
+      [
+        "Aptevo Therapeutics",
+        23
+      ]
+    ]
+  },
+  {
+    "question_text": "According to the annual report, what is the Cash flow from operations (in GBP) for James Halstead plc  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": 6535000,
+    "references": [
+      [
+        "James Halstead",
+        37
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the value of End-of-year tech staff headcount of archTIS Limited at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "archTIS",
+        7
+      ]
+    ]
+  },
+  {
+    "question_text": "For Westwater Resources, Inc., what was the value of Percentage of renewable energy capacity at the end of the period listed in annual report? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Westwater",
+        10
+      ]
+    ]
+  },
+  {
+    "question_text": "Which leadership positions changed at Origin Bancorp, Inc. in the reporting period? If data is not available, return 'N/A'. Give me the title of the position.",
+    "kind": "names",
+    "value": "Chief Legal Counsel, Chief Financial Officer",
+    "references": [
+      [
+        "Origin Bancorp",
+        3
+      ]
+    ]
+  },
+  {
+    "question_text": "What was the Gross margin (%) for Ritchie Bros. Auctioneers Incorporated according to the annual report (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
+    "kind": "number",
+    "value": "N/A",
+    "references": [
+      [
+        "Ritchie Bros",
+        19
+      ]
+    ]
+  }
+]

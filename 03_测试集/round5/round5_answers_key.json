@@ -1,0 +1,233 @@
+{
+ "For Empire Company Limited, what was the Sales for the fiscal year ended May 7, 2022 (in millions of CAD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   30162.4
+  ],
+  "reference_pools": []
+ },
+ "For ACRES Commercial Realty Corp., what was the Total revenues for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   75170
+  ],
+  "reference_pools": []
+ },
+ "For HCA Healthcare, Inc., what was the Revenues for the year ended December 31, 2022 (in millions of USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   60233
+  ],
+  "reference_pools": []
+ },
+ "For Incitec Pivot Limited, what was the Total revenue for the fiscal year ended September 30, 2022 (in millions of AUD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   6315.3
+  ],
+  "reference_pools": []
+ },
+ "For NZME Limited, what was the Revenue for the year ended December 31, 2022 (in thousands of NZD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   355433
+  ],
+  "reference_pools": []
+ },
+ "For Blue Apron Holdings, Inc., what was the Net revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   458467
+  ],
+  "reference_pools": []
+ },
+ "For Playtech plc, what was the Revenue for the year ended December 31, 2022 (in millions of EUR)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   1601.8
+  ],
+  "reference_pools": []
+ },
+ "For Structural Monitoring Systems Plc, what was the Sales revenue for the fiscal year ended June 30, 2022 (in thousands of AUD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   15701
+  ],
+  "reference_pools": []
+ },
+ "For Mosaic Brands Limited, what was the Total assets as at July 2, 2022 (in thousands of AUD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   342466
+  ],
+  "reference_pools": []
+ },
+ "For Kelly Partners Group Holdings Limited, what was the Total assets as at June 30, 2022 (in AUD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   106642496
+  ],
+  "reference_pools": []
+ },
+ "For Incyte Corporation, what was the Total revenues for the year ended December 31, 2022 (in millions of USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   3394.6
+  ],
+  "reference_pools": []
+ },
+ "For Duni Group, what was the Net sales for the year ended December 31, 2022 (in millions of SEK)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   6976
+  ],
+  "reference_pools": []
+ },
+ "For INMUNE BIO INC., what was the Total revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   374
+  ],
+  "reference_pools": []
+ },
+ "For Atreca, Inc., what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   "N/A"
+  ],
+  "reference_pools": []
+ },
+ "For NuCana plc, what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   "N/A"
+  ],
+  "reference_pools": []
+ },
+ "For Westwater Resources, Inc., what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.": {
+  "kind": "number",
+  "answers": [
+   "N/A"
+  ],
+  "reference_pools": []
+ },
+ "Did Empire Company Limited announce a share buyback plan in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   true
+  ],
+  "reference_pools": []
+ },
+ "Did HCA Healthcare, Inc. announce a share buyback plan in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   true
+  ],
+  "reference_pools": []
+ },
+ "Did NZME Limited announce a share buyback plan in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   true
+  ],
+  "reference_pools": []
+ },
+ "Did Playtech plc announce any new product launches in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   true
+  ],
+  "reference_pools": []
+ },
+ "Did Poste Italiane mention any mergers or acquisitions in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   true
+  ],
+  "reference_pools": []
+ },
+ "Did HCA Healthcare, Inc. announce any new product launches in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   false
+  ],
+  "reference_pools": []
+ },
+ "Did Blue Apron Holdings, Inc. mention any mergers or acquisitions in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   false
+  ],
+  "reference_pools": []
+ },
+ "Did RWE AG announce a share buyback plan in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   false
+  ],
+  "reference_pools": []
+ },
+ "Did Structural Monitoring Systems Plc outline any new ESG initiatives in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   false
+  ],
+  "reference_pools": []
+ },
+ "Did Kelly Partners Group Holdings Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.": {
+  "kind": "boolean",
+  "answers": [
+   false
+  ],
+  "reference_pools": []
+ },
+ "Which leadership positions changed at Incitec Pivot Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).": {
+  "kind": "names",
+  "answers": [
+   "Chief Financial Officer,President"
+  ],
+  "reference_pools": []
+ },
+ "Which leadership positions changed at Playtech plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).": {
+  "kind": "names",
+  "answers": [
+   "Chief Financial Officer,Chief Sustainability and Corporate Affairs Officer"
+  ],
+  "reference_pools": []
+ },
+ "Which leadership positions changed at Structural Monitoring Systems Plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).": {
+  "kind": "names",
+  "answers": [
+   "Non-Executive Director"
+  ],
+  "reference_pools": []
+ },
+ "Which leadership positions changed at Downer EDI Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).": {
+  "kind": "names",
+  "answers": [
+   "Chairman,Non-Executive Director"
+  ],
+  "reference_pools": []
+ },
+ "Among the following companies - HCA Healthcare, Inc., Empire Company Limited, Poste Italiane, RWE AG - which company reported the highest number of employees? Return the company name.": {
+  "kind": "names",
+  "answers": [
+   "HCA Healthcare, Inc."
+  ],
+  "reference_pools": []
+ },
+ "Among the following companies - Blue Apron Holdings, Inc., Structural Monitoring Systems Plc, Incyte Corporation, Duni Group - which company reported the lowest number of employees? Return the company name.": {
+  "kind": "names",
+  "answers": [
+   "Structural Monitoring Systems Plc"
+  ],
+  "reference_pools": []
+ },
+ "Among the following companies - Empire Company Limited, Incitec Pivot Limited, Playtech plc, Datalogic - which company reported the highest number of employees? Return the company name.": {
+  "kind": "names",
+  "answers": [
+   "Empire Company Limited"
+  ],
+  "reference_pools": []
+ }
+}

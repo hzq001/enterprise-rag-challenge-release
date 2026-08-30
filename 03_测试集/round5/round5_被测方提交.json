@@ -1,0 +1,398 @@
+[
+ {
+  "question_text": "For Empire Company Limited, what was the Sales for the fiscal year ended May 7, 2022 (in millions of CAD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 30162.4,
+  "references": [
+   [
+    "empire",
+    2
+   ]
+  ],
+  "_note": "Sales 53wk ended May 7 2022 = 30,162.4 (millions CAD)"
+ },
+ {
+  "question_text": "For ACRES Commercial Realty Corp., what was the Total revenues for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 75170,
+  "references": [
+   [
+    "acres",
+    94
+   ]
+  ],
+  "_note": "Total revenues 2022 = 75,170 (thousands USD)"
+ },
+ {
+  "question_text": "For HCA Healthcare, Inc., what was the Revenues for the year ended December 31, 2022 (in millions of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 60233,
+  "references": [
+   [
+    "hca",
+    14
+   ]
+  ],
+  "_note": "Revenues 2022 = 60,233 (millions USD)"
+ },
+ {
+  "question_text": "For Incitec Pivot Limited, what was the Total revenue for the fiscal year ended September 30, 2022 (in millions of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 6315.3,
+  "references": [
+   [
+    "incitec",
+    21
+   ]
+  ],
+  "_note": "Revenue FY Sep30 2022 = 6,315.3 (millions AUD)"
+ },
+ {
+  "question_text": "For NZME Limited, what was the Revenue for the year ended December 31, 2022 (in thousands of NZD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 355433,
+  "references": [
+   [
+    "nzme",
+    52
+   ]
+  ],
+  "_note": "Revenue 2022 = 355,433 (thousands NZD)"
+ },
+ {
+  "question_text": "For Blue Apron Holdings, Inc., what was the Net revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 458467,
+  "references": [
+   [
+    "blue apron",
+    90
+   ]
+  ],
+  "_note": "Net revenue 2022 = 458,467 (thousands USD)"
+ },
+ {
+  "question_text": "For Playtech plc, what was the Revenue for the year ended December 31, 2022 (in millions of EUR)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 1602,
+  "references": [
+   [
+    "playtech",
+    4
+   ]
+  ],
+  "_note": "Revenue 2022 = 1,602 (millions EUR)"
+ },
+ {
+  "question_text": "For Structural Monitoring Systems Plc, what was the Sales revenue for the fiscal year ended June 30, 2022 (in thousands of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 15701,
+  "references": [
+   [
+    "structural",
+    20
+   ]
+  ],
+  "_note": "Sales revenue FY Jun30 2022 = 15,701 (thousands AUD)"
+ },
+ {
+  "question_text": "For Mosaic Brands Limited, what was the Total assets as at July 2, 2022 (in thousands of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 342466,
+  "references": [
+   [
+    "mosaic brands",
+    54
+   ]
+  ],
+  "_note": "Total assets 2022 = 342,466 (thousands AUD)"
+ },
+ {
+  "question_text": "For Kelly Partners Group Holdings Limited, what was the Total assets as at June 30, 2022 (in AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 106642496,
+  "references": [
+   [
+    "kelly partners",
+    29
+   ]
+  ],
+  "_note": "Total assets 2022 = 106,642,496 (AUD)"
+ },
+ {
+  "question_text": "For Incyte Corporation, what was the Total revenues for the year ended December 31, 2022 (in millions of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 3394.6,
+  "references": [
+   [
+    "incyte",
+    85
+   ]
+  ],
+  "_note": "Total revenues 2022 = 3,394,635k = 3,394.6 (millions USD)"
+ },
+ {
+  "question_text": "For Duni Group, what was the Net sales for the year ended December 31, 2022 (in millions of SEK)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 6976,
+  "references": [
+   [
+    "duni",
+    4
+   ]
+  ],
+  "_note": "Net sales 2022 = 6,976 (millions SEK)"
+ },
+ {
+  "question_text": "For INMUNE BIO INC., what was the Total revenue for the year ended December 31, 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 374,
+  "references": [
+   [
+    "inmune",
+    49
+   ]
+  ],
+  "_note": "Revenue 2022 = 374 (thousands USD)"
+ },
+ {
+  "question_text": "For Atreca, Inc., what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 0,
+  "references": [
+   [
+    "atreca",
+    84
+   ]
+  ],
+  "_note": "No revenue line in income statement; total revenue 2022 = 0 (USD)"
+ },
+ {
+  "question_text": "For NuCana plc, what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 0,
+  "references": [
+   [
+    "nucana",
+    166
+   ]
+  ],
+  "_note": "No revenue line; starts with R&D expenses; total revenue 2022 = 0 (USD)"
+ },
+ {
+  "question_text": "For Westwater Resources, Inc., what was the Total revenue for the year ended December 31, 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": 0,
+  "references": [
+   [
+    "westwater",
+    44
+   ]
+  ],
+  "_note": "No revenue line; starts with operating expenses; total revenue 2022 = 0 (USD)"
+ },
+ {
+  "question_text": "Did Empire Company Limited announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "empire",
+    29
+   ]
+  ],
+  "_note": "NCIB repurchase  planned (p29)"
+ },
+ {
+  "question_text": "Did HCA Healthcare, Inc. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "hca",
+    61
+   ]
+  ],
+  "_note": "Board authorized // share repurchases (p61)"
+ },
+ {
+  "question_text": "Did NZME Limited announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "nzme",
+    84
+   ]
+  ],
+  "_note": "Share buyback programme Apr-Dec 2022, up to  (p84)"
+ },
+ {
+  "question_text": "Did Playtech plc announce any new product launches in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "playtech",
+    22
+   ]
+  ],
+  "_note": "Multiple product launches in 2022 (p20-23)"
+ },
+ {
+  "question_text": "Did Poste Italiane mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": true,
+  "references": [
+   [
+    "poste",
+    20
+   ]
+  ],
+  "_note": "Acquisitions LIS, Plurima, Agile Lab, Net Insurance (p20/35)"
+ },
+ {
+  "question_text": "Did HCA Healthcare, Inc. announce any new product launches in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "hca",
+    5
+   ]
+  ],
+  "_note": "No commercial product launches; only internal pilots/DEI"
+ },
+ {
+  "question_text": "Did Blue Apron Holdings, Inc. mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "blue apron",
+    16
+   ]
+  ],
+  "_note": "No substantive M&A; only risk-factor mentions"
+ },
+ {
+  "question_text": "Did RWE AG announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "rwe",
+    75
+   ]
+  ],
+  "_note": "Only 2018 AGM authorization disclosed; no new 2022 buyback plan"
+ },
+ {
+  "question_text": "Did Structural Monitoring Systems Plc outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "structural",
+    76
+   ]
+  ],
+  "_note": "No ESG initiatives; only corporate governance policy"
+ },
+ {
+  "question_text": "Did Kelly Partners Group Holdings Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": false,
+  "references": [
+   [
+    "kelly partners",
+    3
+   ]
+  ],
+  "_note": "No ESG initiatives; only governance statement & sustainability risks"
+ },
+ {
+  "question_text": "Which leadership positions changed at Incitec Pivot Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Chairman-designate",
+  "references": [
+   [
+    "incitec",
+    17
+   ]
+  ],
+  "_note": "Michael Carroll announced as Chairman-designate of future fertilisers business (June)"
+ },
+ {
+  "question_text": "Which leadership positions changed at Playtech plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Chief Financial Officer",
+  "references": [
+   [
+    "playtech",
+    9
+   ]
+  ],
+  "_note": "Andrew Smith stepped down Nov 2022; Chris McGinnis became CFO"
+ },
+ {
+  "question_text": "Which leadership positions changed at Structural Monitoring Systems Plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Chairman",
+  "references": [
+   [
+    "structural",
+    5
+   ]
+  ],
+  "_note": "Will Rouse resigned as Chairman; Ross Love appointed Executive Chairman"
+ },
+ {
+  "question_text": "Which leadership positions changed at Downer EDI Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": "Non-executive Director",
+  "references": [
+   [
+    "downer",
+    6
+   ]
+  ],
+  "_note": "Mark Binns & Mark Menhinnitt appointed Independent NED since Mar 2022"
+ },
+ {
+  "question_text": "Among the following companies - HCA Healthcare, Inc., Empire Company Limited, Poste Italiane, RWE AG - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "HCA Healthcare, Inc.",
+  "references": [
+   [
+    "hca",
+    35
+   ]
+  ],
+  "_note": "HCA ~294,000 employees (Dec 31 2022); Empire 130,000; Poste ~120,000; RWE 18,310"
+ },
+ {
+  "question_text": "Among the following companies - Blue Apron Holdings, Inc., Structural Monitoring Systems Plc, Incyte Corporation, Duni Group - which company reported the lowest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "Structural Monitoring Systems Plc",
+  "references": [
+   [
+    "structural",
+    42
+   ]
+  ],
+  "_note": "SMS avg 114 employees (note5); Blue Apron 1,549; Incyte 2,324; Duni 2,231"
+ },
+ {
+  "question_text": "Among the following companies - Empire Company Limited, Incitec Pivot Limited, Playtech plc, Datalogic - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": "Empire Company Limited",
+  "references": [
+   [
+    "empire",
+    2
+   ]
+  ],
+  "_note": "Empire 130,000; Incitec 5,822; Playtech ~7,000; Datalogic 3,069"
+ }
+]

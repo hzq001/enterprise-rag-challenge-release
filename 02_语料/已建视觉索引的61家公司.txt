@@ -1,0 +1,61 @@
+1-800-FLOWERS.COM, INC.	USD	30f64d1043f4cb425eb636763580ae27094ffef1
+AA Limited	GBP	aa781901e117281bfee6f8e4bea6fc9c9bada62e
+abrdn Japan Investment Trust plc	GBP	d5ad1d288230072e3f6654bb6182d76f8af2ba0a
+ACRES Commercial Realty Corp.	USD	0279901b645e568591ad95dac2c2bf939ef0c00d
+Albany International Corp.	USD	da663e46fbf02ec8a90b3f3c1079ef4c9f7907e1
+Aptevo Therapeutics Inc.	USD	0981826b4b43a88920f3e01c71ae73539bab84cc
+archTIS Limited	USD	c06d5ad4b6408fec26675d30b37a6042c007095a
+Armadale Capital Plc	GBP	a85dba6c75031912d56a811637f803ba4ddeb257
+Atreca, Inc.	EUR	5f226fe96206888930e3baaf0bff70d4b0a1db40
+Aurora Innovation, Inc.	USD	13999998018cc53440310d94a26d1e8957e2277f
+BetMakers Technology Group Ltd	USD	1af8f906e34af6e0acfe4f73e37093bbe34700f3
+Bionano Genomics, Inc.	USD	5a24fa827d172a7669eca206b2a5f47c2b19b48d
+Blue Apron Holdings, Inc.	USD	35839effbc332f23d5f34263aab3dcb2c6976420
+Brave Bison Group plc	GBP	ddd10e4612006205c4b1ba050a11648071e6e429
+Commerzbank	AUD	696ddc4c80febe0f1559ed3b1272487c74ca91cc
+CoreCard Corporation	USD	f015d4bfeec43fe65c003b6f4420ae864efbb58f
+Crombie REIT	USD	14fa568899745270c4ff2c10073f97f2c2e7764b
+Datalogic	EUR	980742aa08ea64d552c153bcefbd7e8243fb9efd
+Downer EDI Limited	USD	0a61a353b1ea9fd9b8f63b60239634ca3007d58f
+Duni Group	EUR	e7a45fed0d7ebfd13a524e7fcc443318bac654e2
+Elixir Energy Limited	USD	f879b3a802ccd6e8e6ca0a07ed8464318b7c0724
+Empire Company Limited	USD	8f5e29eea4f4a3e944707c71148439ca1fd4b2d8
+FNCB Bancorp, Inc.	USD	23b2c590c4887dfb86761730dd7156fe3b216ab7
+Franklin Covey Co.	USD	e30ece688caf7602b734bbbcf39559b4acdb2739
+Guaranty Bancshares, Inc.	USD	4e3efdc544140b872a59e124443a64c34f356911
+HCA Healthcare, Inc.	USD	a69ebee82a9acd54117407ca3697db0d7bfbfdac
+Incitec Pivot Limited	USD	6529fba868216a923407fb0d4e15a811a8e89ebc
+Incyte Corporation	EUR	4d3e52b69b4b5366e54ce87cf641b01b1419bdee
+INMUNE BIO INC.	EUR	553afbf09b6d83166b17acb02431c6cf38e4defc
+James Halstead plc	GBP	71d137454a1524843e1f49b34603438510232919
+Kelly Partners Group Holdings Limited	USD	c8af22dbedd95ee719273792e5964ab8bbba17b2
+Kiniksa Pharmaceuticals, Ltd.	USD	74c690176ce433301f4d1e808bb002a2f4dc321a
+KP Tissue Inc.	USD	d14ae2b6284e48b5c1e6659a0a5863d84697b3b9
+Liberty Broadband Corporation	USD	446545ae548543d8744f8d885ff75face3424ba4
+MainStreet Bancshares, Inc.	USD	53a00624418f6c5c2d044344a4125bba7743614f
+Medallion Financial Corp.	USD	1a12ef3f11a64e92eeca39e493a17d2860c014a6
+MGM Resorts International	USD	e117005fc313bf0d49429d34bc8e1ef64de54898
+Mosaic Brands Limited	USD	12bff07b957b1c8f8cad9d917ca18005720cce9b
+NuCana plc	EUR	9b7fdb871fc4d4a8babc25448257ae0b81a6442d
+NZME Limited	USD	c7475e1d98f9a46a4652e503881d4a67232b41d3
+Ocugen, Inc.	AUD	36dd058d3237202cbb94139611c8b8a35ff8c158
+Origin Bancorp, Inc.	USD	3f36d4f26ada778d89cf5a7344be0b9e9a5223a3
+Peako Limited	USD	105688726e097505beef4934896193ac51295037
+Pintec Technology Holdings Limited	AUD	9e794a58e511f6a6a9a13b201d652deff9f9f69a
+Playtech plc	EUR	ded965ce7e3ea0ad9b83272b8c36f529793a2887
+Poste Italiane	EUR	c74139ce26a6f803725f5074a8a0f539abb99c09
+Rapid7	USD	99cd0edaf5bfb233e5f46ee55af837de0b725274
+Rectifier Technologies Ltd	USD	3bb894b4201667baf60b0b2c8a47109fa2357acb
+Ritchie Bros. Auctioneers Incorporated	USD	78c71282723c2d66216cbba13183d19349d302b8
+RWE AG	EUR	cc0fc5888b99758100a7ff024863fc4337b6b3c5
+Seiko Epson Corporation	AUD	6d76ccb75bbf1b27ca60b8419c5343ac050cebb0
+SIG plc	GBP	2db41ba86cc015db1f5f7de00b764a06e6de3dcc
+Sonic Automotive, Inc.	USD	682de8e45fd9688f3452bc0e18257132a8f3cff6
+SThree plc	GBP	67185fca2a09b3c46ee961b2c1ae160dab8b5231
+Structural Monitoring Systems Plc	USD	3e5ccdb58faf901e75e31f154cb8330869ca5efa
+Terns Pharmaceuticals, Inc.	EUR	79ffb9b8682aa565172233c070a47d944464644c
+Toshiba Corporation	AUD	e273ed0d9626b9feaf50c09405c2b70d461e41d7
+Trinity Place Holdings Inc.	USD	e229fc9f5c694e93b02ac312c231607a04e3e528
+Westwater Resources, Inc.	USD	92d9de8e4db96e0b95a484afcd1c54c6beb62c03
+Wheeler Real Estate Investment Trust, Inc.	USD	b947c33b370d8a3251ef9c36ce7d71e8d16f4f8e
+Ziff Davis, Inc.	USD	ecabab4934d4b80570c4bb3b8e35b7476694b3fb

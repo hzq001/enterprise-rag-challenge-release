@@ -1,0 +1,200 @@
+[
+ {
+  "question_text": "For Ziff Davis, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Aurora Innovation, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Bionano Genomics, Inc., what was the total number of employees as of December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For MainStreet Bancshares, Inc., what was the Earnings per common share (basic and diluted) for 2022 (in USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Kelly Partners Group Holdings Limited, what was the FY2022 Revenue (in AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Mosaic Brands Limited, what was the Total revenue and other income for the year ended 2 July 2022 (in thousands of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Brave Bison Group plc, what was the Total equity as at 31 December 2022 (in thousands of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For MGM Resorts International, what was the Net income (loss) for 2022 (in thousands of USD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Downer EDI Limited, what was the Total borrowings as at 30 June 2022 (in millions of AUD)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For AA Limited, what was the Group revenue for the year ended 31 March 2022 (in millions of GBP)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Trinity Place Holdings Inc., what was the value of Cloud storage capacity (TB) at the end of the period listed in the annual report? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Atreca, Inc., what was the Gross margin (%) according to the annual report? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Pintec Technology Holdings Limited, what was the Dividend per share (in AUD) for the year? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Terns Pharmaceuticals, Inc., what was the Total revenue (in USD) for the year ended December 31, 2022? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Commerzbank, what was the Total assets as at 31 December 2022 (in billions of EUR)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "For Datalogic, what was the Total revenue for the year ended 31 December 2022 (in thousands of EUR)? If data is not available, return 'N/A'.",
+  "kind": "number",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Duni Group announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Structural Monitoring Systems Plc report any changes to its capital structure in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Poste Italiane announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did RWE AG mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Guaranty Bancshares, Inc. announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did archTIS Limited outline any new ESG initiatives in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did INMUNE BIO INC. announce any new product launches in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did NuCana plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Incyte Corporation announce a share buyback plan in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Did Playtech plc mention any mergers or acquisitions in the annual report? If there is no mention, return False.",
+  "kind": "boolean",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at AA Limited in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at Sonic Automotive, Inc. in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at Rectifier Technologies Ltd in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Which leadership positions changed at SThree plc in the reporting period? If data is not available, return 'N/A'. Give the position title(s).",
+  "kind": "name",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc, RWE AG, Commerzbank - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc, RWE AG - which company reported the lowest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ },
+ {
+  "question_text": "Among the following companies - Datalogic, Duni Group, Incyte Corporation, Playtech plc - which company reported the highest number of employees? Return the company name.",
+  "kind": "names",
+  "value": null,
+  "references": []
+ }
+]
