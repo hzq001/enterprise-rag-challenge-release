@@ -139,6 +139,10 @@ enterprise-rag-challenge-release/
 
 ## 二、快速开始
 
+### 直接在codex/workbuddy等agent命令AI， 利用 deepseek-v4-flash-vision-rag skill 解决 enterprise-rag-challenge ！ 
+
+以下是实际代码运行，可以不需要理会：
+
 ```bash
 pip install openai pymupdf
 # API key：环境变量 DEEPSEEK_API_KEY，或写入 ~/.deepseek_api_key 首行
