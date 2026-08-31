@@ -1,6 +1,6 @@
 ---
 name: deepseek-v4-flash-vision-rag
-description: 基于可切换的 OpenAI 兼容视觉模型（默认 deepseek-v4-flash-vision-exp）的 PDF 深度问答（人式读文档 Vision RAG）。当用户提到 PDF、文档、资料、报告、论文、电子书、手册、说明书、图纸、表格，并想提问、查找、搜索、总结或理解其内容，或问"在哪一页"、"引用原文"、要页面截图时，使用本 skill。支持扫描版、图表、图纸、表格、代码的视觉理解；回答带物理页码引用，并把命中页原图展示给用户。
+description: 基于可切换的 OpenAI 兼容视觉模型（默认 deepseek-v4-flash-vision-exp）和 macOS 原生 OCR 的 PDF 深度问答（人式读文档 Vision RAG）。当用户提到 PDF、文档、资料、报告、论文、电子书、手册、说明书、图纸、表格，并想提问、查找、搜索、总结或理解其内容，或问"在哪一页"、"引用原文"、要页面截图时，使用本 skill。支持扫描版、图表、图纸、表格、代码的视觉理解；回答带物理页码引用，并把命中页原图展示给用户。
 ---
 
 # 可切换视觉模型 Vision RAG（人式读文档）
@@ -40,7 +40,8 @@ entries = T.scan_index(pdf, ["headcount reduction", "9,000"])   # 关键词由�
 - 看目录结果，你就能判断：大概在第几页、那页讲什么（title/type）→ 决定翻开哪页
 
 > 注：`ingest.py --route auto` 可给新 PDF 预建索引（人式流程的标准前置步骤；
-> 预建后 scan_index 走索引，快且覆盖扫描页）。PDF 带书签目录时也可直接用。
+> 预建后 scan_index 走索引，快且覆盖扫描页。默认 `SCAN/GARBLED` 使用 Mac Vision OCR，
+> `TABLE/GRAPHIC` 使用 VLM；PDF 带书签目录时也可直接用。
 
 ### 第 2 步：视觉看页（read_vision）—— 翻开那一页，亲眼看看
 
@@ -143,11 +144,13 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 
 ## 环境
 
-- Python 依赖：`openai`、`pymupdf(fitz)`（本机已装）
+- Python 依赖：`openai`、`pymupdf(fitz)`、`pdf-inspector`（Mac OCR 本身不依赖 Python OCR 包）
+- Mac OCR：macOS `Vision.framework` + Swift；安装 Xcode Command Line Tools 后即可使用
 - API key：优先从 `VISION_API_KEY`、`DEEPSEEK_API_KEY`、`CLIPROXY_API_KEY`、`LOCAL_OPENAI_API_KEY`、`OPENAI_API_KEY` 读取，也兼容本机 `~/.deepseek_api_key` 文件首行
 - 模型：默认 `deepseek-v4-flash-vision-exp`，可用 `VISION_MODEL` 或调用参数覆盖
 - 接口：默认 `https://api.deepseek.com`，可用 `VISION_BASE_URL` 或调用参数覆盖
 - 图片输入：默认 `file`，可选 `image_url`；可用 `VISION_INPUT_MODE` 或调用参数覆盖
+- auto OCR 引擎：默认 `mac`，可用 `OCR_ENGINE` 或 `ingest.py --ocr-engine mac|vlm` 覆盖
 - `file` 模式使用 Files API；`image_url` 模式使用远程 URL/data URL，或将本地图片转为 Base64 data URL
 - 核心工具（人式流程直接调用）：`scripts/agentic_tools.py`
   - `scan_index(pdf, keywords)` 查目录（**索引优先**：预建索引秒回，无索引降级即时扫描）
@@ -155,7 +158,7 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
     ｜`read_text(pdf, page0)` 看文本层｜`search_pages(pdf, query)` 兜底检索｜`verify_quote(...)` 自检
   - 依赖 `scripts/ds_client.py`（可切换视觉模型的客户端，由 `read_vision` 调用）
 - **建索引工具（人式流程的标准前置步骤）**：`scripts/ingest.py` → `router.py`（页分类）
-  + `transcribe.py`（视觉转录）→ 落盘 `.cache/<sha>/index.json`（每页转录文本 + 页标题/类型/摘要）。
+  + `transcribe.py`（Mac OCR/VLM 转录）→ 落盘 `.cache/<sha>/index.json`（每页转录文本 + 页标题/类型/摘要）。
   新 PDF 建议先 ingest 预建，`scan_index` 即可秒查索引、且覆盖乱码/扫描页；无索引时自动降级即时扫描。
 - **人式流程才是正确的使用方法**：不写批量代码、不跑 agentic 循环，一次一题，直接调 `agentic_tools` 的工具
 

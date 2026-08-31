@@ -4,20 +4,23 @@
 1. PyMuPDF 渲染每页为 PNG（150dpi，自动钳制在单边 3600px 内，
    满足"单请求 15+ 图时单边 ≤4096px"的限制；单图 token 封顶 384，无需更高分辨率）
 2. 抽取每页文本层（零成本，供本地关键词检索与深读引用）
-3. 按 ``--input-mode`` 准备图片：Files API 并发上传并缓存 file_id，或直接生成 image_url
-4. 分批（默认 25 页/请求）把页图消息块打包给 vision 模型，
+3. auto 路由对 SCAN/GARBLED 使用 Mac Vision OCR；TABLE/GRAPHIC 使用 VLM
+4. VLM 路由按 ``--input-mode`` 准备图片：Files API 并发上传并缓存 file_id，或直接生成 image_url
+5. 分批（默认 25 页/请求）把页图消息块打包给 vision 模型，
    关闭推理 + JSON Output，产出每页结构化记录；截断/失败自动对半拆批重试
-5. 由页级 headings 派生全书大纲（不需要 PageIndex 式的页码映射与修复循环）
-6. 落盘 .cache/<sha256>/index.json
+6. 由页级 headings 派生全书大纲（不需要 PageIndex 式的页码映射与修复循环）
+7. 落盘 .cache/<sha256>/index.json
 
 用法：
   python ingest.py <pdf> [--force] [--limit N] [--batch 25] [--dpi 150] [--workers 6]
-                       [--model MODEL] [--base-url URL] [--input-mode file|image_url] [--clean]
+                       [--ocr-engine mac|vlm] [--model MODEL] [--base-url URL]
+                       [--input-mode file|image_url] [--clean]
 """
 import argparse
 import concurrent.futures
 import hashlib
 import json
+import shutil
 import sys
 import time
 from datetime import datetime
@@ -25,6 +28,7 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 
+import mac_ocr
 from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -192,6 +196,36 @@ def build_outline(pages_records):
     return outline
 
 
+def split_auto_labels(labels: dict, ocr_engine=None) -> tuple[dict, dict]:
+    """按页面类型拆分 auto 路由的本地 OCR 页和 VLM 页。
+
+    SCAN/GARBLED 默认交给 Mac Vision OCR；TABLE/GRAPHIC 始终交给 VLM，
+    因为它们需要保留财务表格的行列关系或理解图形语义。传入 ``vlm`` 时，
+    SCAN/GARBLED 也显式交给 VLM，便于对照实验。
+
+    返回：
+        ``(mac_labels, vlm_labels)``，两者均为 ``{页码: 路由标签}``。
+    """
+    engine = mac_ocr.resolve_ocr_engine(ocr_engine)
+    mac_labels, vlm_labels = {}, {}
+    for page, label in sorted(labels.items()):
+        if label in ("TABLE", "GRAPHIC"):
+            vlm_labels[page] = label
+        elif label in ("SCAN", "GARBLED"):
+            (mac_labels if engine == "mac" else vlm_labels)[page] = label
+    return mac_labels, vlm_labels
+
+
+def cache_is_usable(old: dict, route: str, pages: int, ocr_engine=None) -> bool:
+    """判断已有索引是否与本次路由兼容。"""
+    if old.get("pages_indexed", 0) < pages:
+        return False
+    # auto 的引擎会改变 page_texts/source，旧索引（没有该字段）不能静默复用。
+    if route == "auto" and old.get("ocr_engine") != ocr_engine:
+        return False
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser(description="Build vision index for a PDF")
     ap.add_argument("pdf", type=Path)
@@ -204,9 +238,11 @@ def main():
     ap.add_argument("--base-url", default=None, help="OpenAI 兼容接口地址，默认读取 VISION_BASE_URL")
     ap.add_argument("--input-mode", choices=SUPPORTED_INPUT_MODES, default=None,
                     help="图片输入模式：file 或 image_url，默认读取 VISION_INPUT_MODE")
+    ap.add_argument("--ocr-engine", choices=mac_ocr.SUPPORTED_OCR_ENGINES, default=None,
+                    help="auto 路由的 OCR 引擎：mac（默认）或 vlm；默认读取 OCR_ENGINE")
     ap.add_argument("--clean", action="store_true", help="删除该 PDF 的本地缓存后退出")
     ap.add_argument("--route", choices=("auto", "vision", "text"), default="auto",
-                    help="auto=自适应路由(默认,文本直录+图纸/乱码/扫描VLM转录); "
+                    help="auto=自适应路由(默认,文本直录+Mac OCR+表格/图形VLM); "
                          "vision=全页视觉(旧行为); text=纯文本")
     args = ap.parse_args()
 
@@ -218,9 +254,8 @@ def main():
     cache_dir = CACHE_ROOT / sha[:16]
     if args.clean:
         if cache_dir.exists():
-            for f in cache_dir.glob("*"):
-                f.unlink()
-            cache_dir.rmdir()
+            # auto 索引包含 pages/ 子目录，不能只 unlink 顶层文件。
+            shutil.rmtree(cache_dir)
             print(f"[clean] removed {cache_dir}")
         return
 
@@ -228,11 +263,15 @@ def main():
     total = len(doc)
     n_pages = min(total, args.limit) if args.limit > 0 else total
     index_path = cache_dir / "index.json"
+    selected_ocr_engine = (
+        mac_ocr.resolve_ocr_engine(args.ocr_engine)
+        if args.route == "auto" else None
+    )
 
     if index_path.exists() and not args.force:
         try:
             old = json.loads(index_path.read_text("utf-8"))
-            if old.get("pages_indexed", 0) >= n_pages:
+            if cache_is_usable(old, args.route, n_pages, selected_ocr_engine):
                 print(f"[cache] index exists: {cache_dir}")
                 print(f"[cache] {old['pages_indexed']}/{old['total_pages']} pages indexed, use --force to rebuild")
                 return
@@ -242,11 +281,15 @@ def main():
     print(f"[ingest] {pdf.name}: {total} pages, indexing {n_pages}, route={args.route}, sha={sha[:16]}", flush=True)
     t0 = time.time()
 
-    client = DSClient(base_url=args.base_url, model=args.model, input_mode=args.input_mode)
+    # 纯本地 OCR/text 路由不应因为没有 API key 而失败；只有真正要调用 VLM
+    # 时才初始化客户端。
+    client = None
+    if args.route == "vision":
+        client = DSClient(base_url=args.base_url, model=args.model, input_mode=args.input_mode)
     texts = [doc[i].get_text() for i in range(n_pages)]
 
     if args.route == "auto":
-        # ---- 自适应：pdf-inspector 路由，图纸/乱码/扫描页 VLM 转录 ----
+        # ---- 自适应：文本直录；SCAN/GARBLED 用 Mac OCR；TABLE/GRAPHIC 用 VLM ----
         import router
         from transcribe import transcribe_pages
         # 先全量渲染 PNG（本地零成本）。transcribe 复用缓存里的图，且人式流程的
@@ -255,20 +298,34 @@ def main():
         pages_dir = cache_dir / "pages"
         render_pages(doc, pages_dir, args.dpi)
         labels, text_map, meta = router.classify_pdf(pdf, n_pages)
-        need_vlm = {p: lab for p, lab in labels.items()
-                    if lab in ("GARBLED", "SCAN", "GRAPHIC")}
-        if need_vlm:
-            print(f"[route] {len(need_vlm)} 页需 VLM 转录: "
-                  f"{ {lab: sum(1 for v in need_vlm.values() if v==lab) for lab in set(need_vlm.values())} }",
+        mac_labels, vlm_labels = split_auto_labels(labels, selected_ocr_engine)
+        mac_texts, vlm_texts = {}, {}
+        if mac_labels:
+            print(f"[route] {len(mac_labels)} 页使用 Mac Vision OCR: "
+                  f"{ {lab: sum(1 for v in mac_labels.values() if v == lab) for lab in set(mac_labels.values())} }",
                   flush=True)
-            vlm_texts = transcribe_pages(client, pdf, need_vlm, cache_dir,
+            mac_texts = transcribe_pages(None, pdf, mac_labels, cache_dir,
                                          batch=max(2, args.batch // 2), dpi=args.dpi,
-                                         workers=args.workers)
+                                         workers=args.workers, ocr_engine="mac")
+            for p, t in mac_texts.items():
+                text_map[p] = t.strip().lstrip("】")
+            missing = [p for p in mac_labels if p not in mac_texts]
+            if missing:
+                print(f"[route] WARNING: {len(missing)} 页 Mac OCR 无结果: {missing[:10]}", flush=True)
+
+        if vlm_labels:
+            print(f"[route] {len(vlm_labels)} 页使用 VLM 转录: "
+                  f"{ {lab: sum(1 for v in vlm_labels.values() if v == lab) for lab in set(vlm_labels.values())} }",
+                  flush=True)
+            client = DSClient(base_url=args.base_url, model=args.model, input_mode=args.input_mode)
+            vlm_texts = transcribe_pages(client, pdf, vlm_labels, cache_dir,
+                                         batch=max(2, args.batch // 2), dpi=args.dpi,
+                                         workers=args.workers, ocr_engine="vlm")
             for p, t in vlm_texts.items():
                 text_map[p] = t.strip().lstrip("】")
-            missing = [p for p in need_vlm if p not in vlm_texts]
+            missing = [p for p in vlm_labels if p not in vlm_texts]
             if missing:
-                print(f"[route] WARNING: {len(missing)} 页转录失败: {missing[:10]}", flush=True)
+                print(f"[route] WARNING: {len(missing)} 页 VLM 转录失败: {missing[:10]}", flush=True)
 
         # 页记录（auto：文本页直录；VLM 页用转录文本；不做全页视觉索引，转录即视觉）
         records = {}
@@ -282,15 +339,25 @@ def main():
                 "summary": md[:150],
                 "has": {"figure": lab == "GRAPHIC", "table": lab == "TABLE",
                         "code": False, "formula": False},
-                "source": "vlm" if lab in ("GARBLED", "SCAN", "GRAPHIC") else "text",
+                "source": (
+                    "mac_ocr" if p in mac_texts else
+                    "vlm" if p in vlm_texts else
+                    "text"
+                ),
                 "route_label": lab,
             }
         ordered = [records[p] for p in range(1, n_pages + 1)]
         index = {
             "pdf": str(pdf), "pdf_name": pdf.name, "sha256": sha,
-            "model": client.model, "created": datetime.now().isoformat(timespec="seconds"),
+            "model": client.model if client is not None else "macos-vision",
+            "created": datetime.now().isoformat(timespec="seconds"),
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
-            "route": "auto", "input_mode": client.input_mode,
+            "route": "auto", "ocr_engine": selected_ocr_engine,
+            "input_mode": client.input_mode if client is not None else None,
+            "transcription_pages": {
+                "mac_ocr": sorted(mac_texts),
+                "vlm": sorted(vlm_texts),
+            },
             "pages": ordered,
             "page_texts": [text_map.get(p, "") or texts[p - 1] for p in range(1, n_pages + 1)],
             "outline": [],
@@ -298,9 +365,11 @@ def main():
         save_json(index_path, index)
         from collections import Counter
         dist = Counter(labels.values())
-        vlm_ok = sum(1 for p in need_vlm if p in vlm_texts)
+        mac_ok = sum(1 for p in mac_labels if p in mac_texts)
+        vlm_ok = sum(1 for p in vlm_labels if p in vlm_texts)
         print(f"[done] auto index: {n_pages} 页, 路由 {dict(dist)}, "
-              f"VLM 转录成功 {vlm_ok}/{len(need_vlm)} ({time.time()-t0:.0f}s) -> {index_path}", flush=True)
+              f"Mac OCR {mac_ok}/{len(mac_labels)}, VLM {vlm_ok}/{len(vlm_labels)} "
+              f"({time.time()-t0:.0f}s) -> {index_path}", flush=True)
         return
 
     if args.route == "text":
@@ -311,9 +380,9 @@ def main():
                     "source": "text"} for p in range(1, n_pages + 1)]
         index = {
             "pdf": str(pdf), "pdf_name": pdf.name, "sha256": sha,
-            "model": client.model, "created": datetime.now().isoformat(timespec="seconds"),
+            "model": "text-layer", "created": datetime.now().isoformat(timespec="seconds"),
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
-            "route": "text", "input_mode": client.input_mode, "pages": ordered,
+            "route": "text", "ocr_engine": None, "input_mode": None, "pages": ordered,
             "page_texts": texts, "outline": [],
         }
         save_json(index_path, index)
@@ -356,6 +425,7 @@ def main():
         "sha256": sha,
         "model": client.model,
         "input_mode": client.input_mode,
+        "ocr_engine": "vlm",
         "created": datetime.now().isoformat(timespec="seconds"),
         "total_pages": total,
         "pages_indexed": n_pages,

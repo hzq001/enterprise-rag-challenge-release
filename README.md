@@ -144,7 +144,7 @@ enterprise-rag-challenge-release/
 以下是实际代码运行，可以不需要理会：
 
 ```bash
-pip install openai pymupdf
+pip install openai pymupdf pdf-inspector
 # 默认 DeepSeek：
 export DEEPSEEK_API_KEY='...'
 # 也可以统一配置任意 OpenAI 兼容视觉接口：
@@ -152,14 +152,29 @@ export VISION_API_KEY='...'
 export VISION_BASE_URL='http://localhost:8317/v1'
 export VISION_MODEL='gpt-5.6-luna'
 export VISION_INPUT_MODE='image_url'
+
+# auto 路由默认：SCAN/GARBLED 用 Mac Vision OCR；TABLE/GRAPHIC 用 VLM
+export OCR_ENGINE='mac'
 ```
 
 图片输入有两种模式：`file` 使用 Files API 上传并缓存 `file_id`；`image_url` 使用远程 URL、data URL，或把本地图片转换为 Base64 data URL，不访问 Files API。默认模式为 `file`，可用 `VISION_INPUT_MODE` 或命令行参数切换；不做自动 fallback。
+
+`ingest.py --route auto` 的页面处理策略是：普通文本页直接读取，`SCAN/GARBLED` 默认使用 Mac 原生 `Vision.framework` OCR，`TABLE/GRAPHIC` 使用视觉模型以保留财务表格的行列关系和图形语义。可用 `--ocr-engine vlm` 把扫描/乱码页显式切换到 VLM；两种引擎不做隐藏式自动回退。
 
 预建索引时也可逐次覆盖模型、接口和输入模式：
 
 ```bash
 python 01_skill/scripts/ingest.py "你的文件.pdf" --route vision \
+  --model gpt-5.6-luna \
+  --base-url http://localhost:8317/v1 \
+  --input-mode image_url
+```
+
+默认 auto 路由（Mac OCR + 表格/图形 VLM）：
+
+```bash
+python 01_skill/scripts/ingest.py "你的文件.pdf" --route auto \
+  --ocr-engine mac \
   --model gpt-5.6-luna \
   --base-url http://localhost:8317/v1 \
   --input-mode image_url

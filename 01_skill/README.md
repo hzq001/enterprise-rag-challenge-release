@@ -60,8 +60,11 @@
 ## 四、环境要求
 
 ```bash
-pip install openai pymupdf   # 本机一般已装好
+pip install openai pymupdf pdf-inspector   # VLM/文本路由依赖
 ```
+
+Mac 原生 OCR 还需要 macOS 的 `Vision.framework` 和 Swift（安装 Xcode Command Line Tools
+即可），不需要额外下载 OCR 模型。当前本机已验证支持 `zh-Hans`、`zh-Hant`、`en-US`。
 
 API key 不内置在代码里（skill 可公开分发）。优先设置 `VISION_API_KEY`；也兼容
 `DEEPSEEK_API_KEY`、`CLIPROXY_API_KEY`、`LOCAL_OPENAI_API_KEY`、`OPENAI_API_KEY`，
@@ -80,6 +83,9 @@ export VISION_BASE_URL=http://localhost:8317/v1
 export VISION_MODEL=gpt-5.6-luna
 export VISION_INPUT_MODE=image_url
 export VISION_API_KEY='...'
+
+# auto 路由默认使用 Mac Vision OCR 处理 SCAN/GARBLED 页
+export OCR_ENGINE=mac
 ```
 
 图片输入模式说明：`file` 使用 Files API 并复用 `files.json`；`image_url` 接受远程 URL、data URL，
@@ -94,12 +100,23 @@ export VISION_API_KEY='...'
 
 ```bash
 python scripts/ingest.py "你的文件.pdf" --route auto \
-  [--model MODEL] [--base-url URL] [--input-mode file|image_url]
+  [--ocr-engine mac|vlm] [--model MODEL] [--base-url URL] [--input-mode file|image_url]
 #   → router.py 页分类（TEXT/TABLE/GARBLED/SCAN/GRAPHIC）
-#   → transcribe.py 对乱码/扫描/图纸页做 VLM 转录回填 page_texts
+#   → TEXT 直接取文本层；SCAN/GARBLED 默认用 Mac OCR
+#   → TABLE/GRAPHIC 用 VLM 保留表格行列或图形语义
 #   → 落盘 .cache/<sha>/index.json（含 page_texts 目录 + pages/ 渲染图）
 #   → file 模式额外保存 files.json；image_url 模式不使用 Files API
 ```
+
+如需把扫描/乱码页也交给视觉模型做对照实验，显式指定：
+
+```bash
+python scripts/ingest.py "你的文件.pdf" --route auto --ocr-engine vlm \
+  --model gpt-5.6-luna --base-url http://localhost:8317/v1 --input-mode image_url
+```
+
+`--ocr-engine mac` 只处理 `SCAN/GARBLED`；`TABLE/GRAPHIC` 无论该选项如何设置都使用 VLM，
+因为财务表格需要行列、单位和期间信息。两种引擎之间不做隐藏式自动回退，失败会明确报错。
 
 - 重复运行命中缓存，瞬间返回；`--force` 重建、`--clean` 清缓存
 - 不建索引也能用（`scan_index` 自动降级即时扫描），但慢且乱码/扫描页检索不到
@@ -122,9 +139,11 @@ deepseek-v4-flash-vision-rag/
 ├── scripts/
 │   ├── agentic_tools.py     # 人式工具集：scan_index / read_vision / read_text / search_pages / verify_quote
 │   ├── ds_client.py         # 可切换模型和图片输入模式的 VLM 客户端
+│   ├── mac_ocr.py            # Mac Vision OCR 的 Python 适配层
+│   ├── mac_ocr.swift         # Vision.framework OCR CLI
 │   ├── ingest.py            # 建索引（→ router + transcribe）；scan_index 的索引来源
 │   ├── router.py            # 页分类器（ingest 依赖）
-│   ├── transcribe.py        # 乱码/扫描/图纸页 VLM 转录（ingest 依赖）
+│   ├── transcribe.py        # Mac OCR/VLM 转录（ingest 依赖）
 │   ├── show.py              # 指定页高清渲染（展示用）
 │   └── _inspect_cache.py    # 缓存检查小工具
 ├── references/
@@ -144,3 +163,5 @@ deepseek-v4-flash-vision-rag/
 - 超长跨页内容（如一张表横跨 3 页）深读时只带 ±1 邻页，极端情况用 `show.py` 看全
 - 纯语音/视频型 PDF 不支持；加密 PDF 需先解密
 - 页码统一按**物理页码**（第 1 张图 = 第 1 页），与书的印刷页码可能差一个前言偏移
+- Mac OCR 返回识别行和坐标，不负责还原复杂财务表格的单元格关系；表格/图表页由 VLM 处理
+- Mac OCR 只在 macOS 上可用；非 macOS 环境需显式使用 `--ocr-engine vlm` 或 `--route vision`

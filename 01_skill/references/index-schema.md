@@ -8,7 +8,8 @@
   "pdf_name": "test.pdf",
   "sha256": "全文哈希，缓存键",
   "model": "deepseek-v4-flash-vision-exp",
-  "input_mode": "file",          // file 或 image_url
+  "input_mode": "file",          // VLM 为 file/image_url；纯 Mac OCR 为 null
+  "ocr_engine": "mac",            // auto 选择：mac 或 vlm
   "created": "ISO 时间",
   "total_pages": 120,          // PDF 实际页数
   "pages_indexed": 120,        // 已索引页数（--limit 时小于 total_pages）
@@ -64,11 +65,14 @@
 ```jsonc
 "route": "auto",
 "pages": [{ "page": 1, "type": "...", "summary": "...",
-            "source": "text | vlm",      // vlm = VLM 转录来源
+            "source": "text | mac_ocr | vlm", // 页面文本来源
             "route_label": "TEXT|TABLE|GRAPHIC|SCAN|GARBLED" }],
-"page_texts": ["文本页直录文本 或 乱码/图纸/扫描页的 VLM 转录文本"]
+"page_texts": ["文本页直录文本 或 Mac OCR/VLM 转录文本"]
 ```
 
-- `page_texts` 对 GARBLED/SCAN/GRAPHIC 页存放**转录文本**（不再是 PyMuPDF 原始垃圾/空），
+- `page_texts` 对 GARBLED/SCAN/TABLE/GRAPHIC 页存放**转录文本**（不再是 PyMuPDF 原始垃圾/空），
   因此这些页可被本地检索命中（消除盲区）
-- 转录由 `scripts/transcribe.py` 完成；渲染 PNG 复用 `.cache/<sha>/`，`file` 模式同时复用 file_id，`image_url` 模式不上传。
+- 转录由 `scripts/transcribe.py` 完成：SCAN/GARBLED 默认由 `scripts/mac_ocr.py` 调用
+  `mac_ocr.swift`，TABLE/GRAPHIC 由 VLM 处理；渲染 PNG 复用 `.cache/<sha>/`，VLM 的
+  `file` 模式同时复用 file_id，`image_url` 模式不上传。
+- auto 索引额外保存 `transcription_pages: {"mac_ocr": [...], "vlm": [...]}`，记录实际来源页。

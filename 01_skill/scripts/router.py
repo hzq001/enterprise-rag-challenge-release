@@ -5,7 +5,7 @@
     TEXT    文本层可用且质量好       → 文本直录（快、省）
     TABLE   表格页                  → 文本直录 + 可选 VLM 校验
     GARBLED 文本层是乱码            → VLM 朗读干净渲染图
-    SCAN    扫描件/无文本层          → VLM OCR
+    SCAN    扫描件/无文本层          → Mac OCR（或显式 VLM）
     GRAPHIC 低文本+高图像（图纸）    → VLM 图纸转录（标注/尺寸/图例）
 
 依赖：
@@ -42,6 +42,10 @@ def _is_garbled(raw_text: str) -> bool:
     if len(raw_text.strip()) < MIN_TEXT_CHARS:
         return False
     import re as _re
+    # 旧规则只看英文高频词，会把中文年报正文/表格误判成乱码。
+    # 中文文本不适用英文 stopword 统计，交给文本层或表格路由处理。
+    if len(_re.findall(r"[\u3400-\u4dbf\u4e00-\u9fff]", raw_text)) >= 8:
+        return False
     hits = len(set(_re.findall(r"[a-z]+", raw_text.lower())) & _COMMON_WORDS)
     return hits < GARBLED_STOPWORD_HITS
 
@@ -105,10 +109,18 @@ def classify_pdf(pdf: Path, limit: int = 0):
         if needs_ocr and "garbled" in reason:
             label = "GARBLED"
         elif needs_ocr:
-            if img_ratio > 0.5:
-                label = "GRAPHIC"          # 大图扫描/图纸
+            # pdf-inspector 对整页图片型 PDF 会明确给出 scanned。整页扫描
+            # 仍然应该走 OCR；不能仅凭图像面积把它误判成图纸并交给 VLM。
+            if reason in ("scanned", "scan"):
+                label = "SCAN"
+            elif img_ratio > 0.5:
+                label = "GRAPHIC"          # 非标准扫描的高图像页/图纸
             else:
                 label = "SCAN"             # 扫描件/无文本
+        elif p in tbl_pages and n_chars >= MIN_TEXT_CHARS:
+            # 表格优先于通用乱码启发式：短英文表格常没有足够 stopword，
+            # 中文表格也不应因为语言比例被送进 GARBLED。
+            label = "TABLE"
         elif _is_garbled(raw_text):
             label = "GARBLED"              # 有字符但乱码
         elif n_chars < MIN_TEXT_CHARS:
