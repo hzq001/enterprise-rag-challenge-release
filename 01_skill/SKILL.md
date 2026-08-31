@@ -23,19 +23,24 @@ description: 基于DeepSeek视觉大模型（deepseek-v4-flash-vision-exp）的P
 
 ### 第 1 步：查目录（scan_index）—— 先知道"大概在哪"
 
-人拿到一本书，先翻目录。你拿到 PDF，先扫目录：
+人拿到一本书，先翻目录页——目录是**预先整理好的**（标题、主题、页码）。你拿到 PDF，同样先查**预建索引**（`.cache/<sha>/index.json`，由 ingest.py 预建：每页转录文本 + 页标题/类型/摘要）：
 
 ```python
 entries = T.scan_index(pdf, ["headcount reduction", "9,000"])   # 关键词由你想
-# 返回: [{keyword, page(1基), excerpt}, ...] 按页码排列
+# 返回: [{keyword, page(1基), excerpt, title, type, source}, ...] 按页码排列
+# source="index" = 查预建索引（秒回，不打开 PDF）
+# source="live"  = 无索引时降级即时扫描文本层（会话内只全量解析一次）
 ```
 
+- **索引优先**：有预建索引先查索引（快、且转录让乱码/扫描页也可检索）；
+  没有索引才即时扫描——**每个 PDF 同一会话内只全量解析一次**，换词不重复扫。
 - **关键词由你判断**：题目说 "employees let go"，你要想到年报里可能写
   "headcount reduction / job cuts / restructuring / redundancies"
 - 题目说 "leadership positions changed"，要想到 "appointed / resigned / effective"
-- 看目录结果，你就能判断：大概在第几页、那页讲了什么 → 决定翻开哪页
+- 看目录结果，你就能判断：大概在第几页、那页讲什么（title/type）→ 决定翻开哪页
 
-> 注：PDF 若带书签目录（get_toc），可直接用；没有就用 scan_index 扫。
+> 注：`ingest.py --route auto` 可给新 PDF 预建索引（人式流程的标准前置步骤；
+> 预建后 scan_index 走索引，快且覆盖扫描页）。PDF 带书签目录时也可直接用。
 
 ### 第 2 步：视觉看页（read_vision）—— 翻开那一页，亲眼看看
 
@@ -70,7 +75,7 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 
 | 工具 | 用途 | 什么时候用 |
 |---|---|---|
-| `scan_index(pdf, keywords)` | **查目录**：关键词出现在哪些页+上下文 | 第 1 步，定位大概位置 |
+| `scan_index(pdf, keywords)` | **查目录**：优先查预建索引（.cache），无则即时扫描；返回页码+页标题/类型+上下文 | 第 1 步，定位大概位置（反复换词调用） |
 | `read_vision(pdf, page0, instr)` | **看图（你的眼睛）**：渲染该页，按你的指令提取 | 第 2 步，视觉查看 |
 | `read_text(pdf, page0)` | 快速瞄一眼文本层（零成本） | 先看文字再决定要不要看图 |
 | `search_pages(pdf, query)` | 辅助检索（带词干匹配） | 目录扫不到时兜底 |
@@ -141,11 +146,13 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 - Python 依赖：`openai`、`pymupdf(fitz)`（本机已装）
 - API key：从环境变量 `DEEPSEEK_API_KEY` 或本机 `~/.deepseek_api_key` 文件（首行）读取
 - 核心工具（人式流程直接调用）：`scripts/agentic_tools.py`
-  - `scan_index(pdf, keywords)` 查目录｜`read_vision(pdf, page0, instr)` 看图（眼睛）
+  - `scan_index(pdf, keywords)` 查目录（**索引优先**：预建索引秒回，无索引降级即时扫描）
+    ｜`read_vision(pdf, page0, instr)` 看图（眼睛）
     ｜`read_text(pdf, page0)` 看文本层｜`search_pages(pdf, query)` 兜底检索｜`verify_quote(...)` 自检
   - 依赖 `scripts/ds_client.py`（DeepSeek VLM 客户端，由 `read_vision` 调用）
-- 可选的一次性建索引工具（**非人式流程**，仅供需要给新 PDF 预建目录缓存时用）：
-  `scripts/ingest.py` → `router.py`（页分类）+ `transcribe.py`（视觉转录）→ 落盘 `.cache/<sha>/index.json`
+- **建索引工具（人式流程的标准前置步骤）**：`scripts/ingest.py` → `router.py`（页分类）
+  + `transcribe.py`（视觉转录）→ 落盘 `.cache/<sha>/index.json`（每页转录文本 + 页标题/类型/摘要）。
+  新 PDF 建议先 ingest 预建，`scan_index` 即可秒查索引、且覆盖乱码/扫描页；无索引时自动降级即时扫描。
 - **人式流程才是正确的使用方法**：不写批量代码、不跑 agentic 循环，一次一题，直接调 `agentic_tools` 的工具
 
 ## 其他参考

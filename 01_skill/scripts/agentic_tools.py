@@ -16,6 +16,8 @@ Agentic RAG 工具集：5 个原子能力，由 AI 主循环自主调用。
 """
 from __future__ import annotations
 
+import functools
+import hashlib
 import json
 import re
 import sys
@@ -23,6 +25,97 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).parent
+
+# ---------------------------------------------------------------------------
+# 索引定位（人式流程第 1 步的"目录"）：.cache/<sha256前16>/index.json
+# ingest.py 预建的索引 = 每页转录文本(page_texts) + 结构目录(pages: type/
+# headings/keywords/summary) + 书签(outline)。scan_index 优先查它，像人先翻目录。
+# ---------------------------------------------------------------------------
+@functools.lru_cache(maxsize=64)
+def _find_index(pdf_path):
+    """定位 PDF 的预建索引（.cache/<sha256前16>/index.json）；无则返回 None。"""
+    try:
+        h = hashlib.sha256(Path(pdf_path).read_bytes()).hexdigest()[:16]
+    except OSError:
+        return None
+    idx = HERE.parent / ".cache" / h / "index.json"
+    if not idx.exists():
+        return None
+    try:
+        j = json.loads(idx.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    # 校验：索引内 pdf 文件名与传入一致，sha256 前缀匹配（防不同文件同前缀）
+    name = Path(str(j.get("pdf", ""))).name
+    if name and name != Path(pdf_path).name:
+        return None
+    if j.get("sha256") and not str(j["sha256"]).startswith(h):
+        return None
+    return j
+
+
+@functools.lru_cache(maxsize=32)
+def _page_texts_live(pdf_path):
+    """会话级文本层缓存：一次提取全 PDF 每页文本（降级路径用，换词不重复全量解析）。"""
+    import fitz
+    doc = fitz.open(str(pdf_path))
+    texts = tuple(doc[i].get_text() for i in range(len(doc)))
+    doc.close()
+    return texts
+
+
+def _scan_via_index(idx, keywords, max_per_keyword):
+    """在预建索引里查目录：页码 + 该页标题/类型 + 命中上下文（不打开 PDF）。"""
+    ptexts = idx.get("page_texts") or []
+    meta = {p.get("page"): p for p in (idx.get("pages") or []) if isinstance(p, dict)}
+    out = []
+    for kw in [k for k in keywords if k]:
+        kl = kw.lower()
+        for i, t in enumerate(ptexts):
+            low = t.lower()
+            for m in list(re.finditer(re.escape(kl), low))[:max_per_keyword]:
+                s = max(0, m.start() - 120)
+                e = min(len(t), m.end() + 120)
+                md = meta.get(i + 1, {})
+                out.append({
+                    "keyword": kw,
+                    "page": i + 1,               # 1基
+                    "page0": i,                  # 0基
+                    "excerpt": re.sub(r"\s+", " ", t[s:e]).strip(),
+                    "title": (md.get("headings") or [None])[0],
+                    "type": md.get("type"),
+                    "source": "index",
+                })
+    out.sort(key=lambda x: x["page"])
+    return out
+
+
+def _scan_live(pdf_path, keywords, context, max_per_keyword, pages):
+    """降级：无预建索引时即时扫描文本层（会话内只全量解析一次）。"""
+    texts = _page_texts_live(pdf_path)
+    total = len(texts)
+    page_range = pages if pages is not None else range(total)
+    out = []
+    for i in page_range:
+        if not (0 <= i < total):
+            continue
+        txt, low = texts[i], texts[i].lower()
+        for kw in [k for k in keywords if k]:
+            kl = kw.lower()
+            for m in list(re.finditer(re.escape(kl), low))[:max_per_keyword]:
+                s = max(0, m.start() - context)
+                e = min(len(txt), m.end() + context)
+                out.append({
+                    "keyword": kw,
+                    "page": i + 1,
+                    "page0": i,
+                    "excerpt": re.sub(r"\s+", " ", txt[s:e]).strip(),
+                    "title": None,
+                    "type": None,
+                    "source": "live",
+                })
+    out.sort(key=lambda x: x["page"])
+    return out
 
 # ---------------------------------------------------------------------------
 # 工具 1：侦察 —— 摸清 PDF 是什么（AI 判断后续策略的依据）
@@ -65,45 +158,26 @@ def inspect_pdf(pdf_path, n_pages: int = 0, dpi: int = 150) -> dict:
 # ---------------------------------------------------------------------------
 # 工具 2：查目录（scan_index）—— 像人翻书目录一样，看关键词出现在哪些页
 # 这是「人式读文档」的第 1 步：先定位大概位置，再决定看哪页。
+# 索引优先：有 ingest 预建索引（.cache/<sha16>/index.json）先查索引（不打开 PDF）；
+#           无索引才降级为即时扫描文本层（会话内只全量解析一次）。
 # ---------------------------------------------------------------------------
 def scan_index(pdf_path, keywords, context: int = 120, max_per_keyword: int = 8,
                pages: list | None = None) -> list:
-    """按关键词扫描文档，返回"目录条目"：每个关键词命中的页 + 上下文。
+    """查目录：关键词命中哪些页 + 每页讲什么（title/type）+ 上下文。
 
     用法（AI 判断关键词）：
         scan_index(pdf, ["headcount", "job reduction", "9,000"])
         scan_index(pdf, ["appointed", "resigned", "effective"])
-    返回：
+    返回（每条 = 一个"目录条目"）：
         [{"keyword": str, "page": int(1基), "page0": int(0基),
-          "excerpt": 命中处上下文(前后 context 字符)}, ...]
-    像人翻目录：一眼看到"关键词在这几页、大概讲了什么"，再决定翻开哪页。
+          "excerpt": 命中处上下文, "title": 该页标题/None, "type": 页类型/None,
+          "source": "index"(查预建索引) | "live"(即时扫描)}, ...]
+    像人翻目录：一眼看到"关键词在这几页、每页大概讲什么"，再决定翻开哪页。
     """
-    import fitz
-    doc = fitz.open(str(pdf_path))
-    total = len(doc)
-    page_range = pages if pages is not None else range(total)
-    kws = [k for k in keywords if k]
-    out = []
-    for i in page_range:
-        if not (0 <= i < total):
-            continue
-        txt = doc[i].get_text()
-        low = txt.lower()
-        for kw in kws:
-            kl = kw.lower()
-            for m in list(re.finditer(re.escape(kl), low))[:max_per_keyword]:
-                s = max(0, m.start() - context)
-                e = min(len(txt), m.end() + context)
-                out.append({
-                    "keyword": kw,
-                    "page": i + 1,          # 1基，方便与"第N页"对齐
-                    "page0": i,             # 0基
-                    "excerpt": re.sub(r"\s+", " ", txt[s:e]).strip(),
-                })
-    doc.close()
-    # 按页排序（像目录按页码排）
-    out.sort(key=lambda x: x["page"])
-    return out
+    idx = _find_index(pdf_path)
+    if idx is not None and (idx.get("page_texts") or idx.get("pages")):
+        return _scan_via_index(idx, keywords, max_per_keyword)
+    return _scan_live(pdf_path, keywords, context, max_per_keyword, pages)
 
 
 # ---------------------------------------------------------------------------

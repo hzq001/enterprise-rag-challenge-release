@@ -27,7 +27,7 @@
 
 | 工具 | 用途 | 什么时候用 |
 |---|---|---|
-| `scan_index(pdf, keywords)` | **查目录**：关键词出现在哪些页 + 上下文 | 第 1 步，定位大概位置 |
+| `scan_index(pdf, keywords)` | **查目录**：优先查预建索引（秒回+带页标题/类型），无索引降级即时扫描 | 第 1 步，定位大概位置 |
 | `read_vision(pdf, page0, instr)` | **看图（你的眼睛）**：渲染该页，按你的指令提取 | 第 2 步，视觉查看 |
 | `read_text(pdf, page0)` | 快速瞄一眼文本层（零成本） | 先看文字再决定要不要看图 |
 | `search_pages(pdf, query)` | 辅助检索（带词干匹配） | 目录扫不到时兜底 |
@@ -39,7 +39,9 @@
 
 ## 三、工作流（像人一样读文档）
 
-1. **查目录（`scan_index`）**——题目说 "employees let go"，你想年报可能写
+1. **查目录（`scan_index`）**——像人先翻目录页：**优先查预建索引**（`.cache/<sha>/index.json`，
+   每页转录文本 + 页标题/类型/摘要，秒回、覆盖乱码/扫描页）；无索引自动降级即时扫描
+   （会话内每个 PDF 只全量解析一次）。题目说 "employees let go"，你想年报可能写
    "headcount reduction / job cuts / restructuring"；主动换词扫，看命中页与上下文，
    判断大概在第几页。
 2. **视觉看页（`read_vision`）**——翻开那一页，按你构造的指令逐字读出相关内容、表格数字、图注。
@@ -66,21 +68,21 @@ API key 不内置在代码里（skill 可公开分发）：设置环境变量 `D
 
 ---
 
-## 五、可选：一次性建索引（预建目录缓存，非人式必需）
+## 五、建索引（人式流程的标准前置步骤）
 
-人式流程本身 **不依赖** 预建索引——`scan_index` 直接读 PDF 文本层、`read_vision` 直接渲染，
-实时即可工作。若你想给一批新 PDF 预先生成 `.cache/<sha>/index.json`（含 `page_texts` 目录 +
-每页渲染图 + Files API 映射）以便离线检索或复用，可用一次性建索引工具：
+`scan_index` 是**索引优先**的：有预建索引（`.cache/<sha>/index.json`）就秒查索引（不打开 PDF、
+带页标题/类型、转录让乱码/扫描页也可检索）；没有才降级即时扫描。因此**新 PDF 建议先建索引**：
 
 ```bash
 python scripts/ingest.py "你的文件.pdf" --route auto
 #   → router.py 页分类（TEXT/TABLE/GARBLED/SCAN/GRAPHIC）
 #   → transcribe.py 对乱码/扫描/图纸页做 VLM 转录回填 page_texts
-#   → 落盘 .cache/<sha>/index.json（含 pages/ 渲染图、files.json）
+#   → 落盘 .cache/<sha>/index.json（含 page_texts 目录 + pages/ 渲染图 + files.json）
 ```
 
 - 重复运行命中缓存，瞬间返回；`--force` 重建、`--clean` 清缓存
-- 这一套是**批量预处理**，不属于"人式一次一题"的使用方法，默认不启用
+- 不建索引也能用（`scan_index` 自动降级即时扫描），但慢且乱码/扫描页检索不到
+- 61 份已建索引的 round2 PDF 缓存可复用（见 `02_语料/已建视觉索引的61家公司.txt`）
 
 展示指定页原图（无需建索引）：
 
@@ -99,17 +101,17 @@ deepseek-v4-flash-vision-rag/
 ├── scripts/
 │   ├── agentic_tools.py     # 人式工具集：scan_index / read_vision / read_text / search_pages / verify_quote
 │   ├── ds_client.py         # DeepSeek VLM 客户端（read_vision 依赖）
-│   ├── ingest.py            # [可选] 一次性建索引（→ router + transcribe）
-│   ├── router.py            # [可选] 页分类器（ingest 依赖）
-│   ├── transcribe.py        # [可选] 乱码/扫描/图纸页 VLM 转录（ingest 依赖）
+│   ├── ingest.py            # 建索引（→ router + transcribe）；scan_index 的索引来源
+│   ├── router.py            # 页分类器（ingest 依赖）
+│   ├── transcribe.py        # 乱码/扫描/图纸页 VLM 转录（ingest 依赖）
 │   ├── show.py              # 指定页高清渲染（展示用）
 │   └── _inspect_cache.py    # 缓存检查小工具
 ├── references/
 │   ├── api-notes.md         # DeepSeek API 实测要点与坑（改代码前必读）
 │   └── index-schema.md      # .cache 索引 JSON 结构、提示词、缓存机制
-└── .cache/                  # 索引缓存（按 PDF 内容哈希分目录；ingest 产出，人式流程可复用其 page_texts 作目录）
+└── .cache/                  # 预建索引（按 PDF 内容哈希分目录；scan_index 第 1 步优先查这里）
     └── <sha256前16位>/
-        ├── index.json        # 读书卡片 + 文字层 + 大纲（page_texts 即"目录"）
+        ├── index.json        # 每页转录文本 page_texts + 页目录（type/headings/keywords/summary）+ 大纲
         ├── files.json        # 页码 → Files API file_id 映射
         └── pages/p0001.png   # 每页渲染图
 ```
