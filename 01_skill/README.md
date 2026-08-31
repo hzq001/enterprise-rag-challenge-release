@@ -1,9 +1,9 @@
-# DeepSeek V4-Flash Vision RAG（人式读文档）
+# 可切换视觉模型 Vision RAG（人式读文档）
 
 > 让 AI **像人一样翻开一份 PDF**：先翻目录定位，再亲眼去看那一页，找不到就深挖，
 > 最后带物理页码引用给出答案，并把那一页原图展示给你核对。
 
-基于 DeepSeek 视觉大模型 `deepseek-v4-flash-vision-exp` 的 PDF 深度问答（vision RAG）。
+基于 OpenAI 兼容视觉接口的 PDF 深度问答（vision RAG），默认模型为 `deepseek-v4-flash-vision-exp`，模型、Base URL 和图片输入模式均可切换。
 支持文字版、扫描版、图表、表格、代码、公式的视觉理解；回答带物理页码引用。
 
 ---
@@ -33,7 +33,7 @@
 | `search_pages(pdf, query)` | 辅助检索（带词干匹配） | 目录扫不到时兜底 |
 | `verify_quote(quote, evidence, kind, value)` | 自检：引用真实存在于页面 | 出答案前核验 |
 
-`read_vision` 内部通过 `scripts/ds_client.py`（DeepSeek VLM 客户端）渲染并调用视觉模型。
+`read_vision` 内部通过 `scripts/ds_client.py`（可切换的视觉模型客户端）渲染并调用视觉模型。
 
 ---
 
@@ -63,8 +63,27 @@
 pip install openai pymupdf   # 本机一般已装好
 ```
 
-API key 不内置在代码里（skill 可公开分发）：设置环境变量 `DEEPSEEK_API_KEY`，
-或把 key 写入 `~/.deepseek_api_key` 文件首行（仅存在于本机）。
+API key 不内置在代码里（skill 可公开分发）。优先设置 `VISION_API_KEY`；也兼容
+`DEEPSEEK_API_KEY`、`CLIPROXY_API_KEY`、`LOCAL_OPENAI_API_KEY`、`OPENAI_API_KEY`，
+或把 DeepSeek key 写入 `~/.deepseek_api_key` 文件首行（仅存在于本机）。
+
+默认配置与切换示例：
+
+```bash
+# 默认值
+export VISION_BASE_URL=https://api.deepseek.com
+export VISION_MODEL=deepseek-v4-flash-vision-exp
+export VISION_INPUT_MODE=file
+
+# 切换到本地 OpenAI 兼容网关和 image_url
+export VISION_BASE_URL=http://localhost:8317/v1
+export VISION_MODEL=gpt-5.6-luna
+export VISION_INPUT_MODE=image_url
+export VISION_API_KEY='...'
+```
+
+图片输入模式说明：`file` 使用 Files API 并复用 `files.json`；`image_url` 接受远程 URL、data URL，
+本地图片会自动转换为 Base64 data URL，因此不会访问或生成 `files.json`。不设置自动 fallback。
 
 ---
 
@@ -74,10 +93,12 @@ API key 不内置在代码里（skill 可公开分发）：设置环境变量 `D
 带页标题/类型、转录让乱码/扫描页也可检索）；没有才降级即时扫描。因此**新 PDF 建议先建索引**：
 
 ```bash
-python scripts/ingest.py "你的文件.pdf" --route auto
+python scripts/ingest.py "你的文件.pdf" --route auto \
+  [--model MODEL] [--base-url URL] [--input-mode file|image_url]
 #   → router.py 页分类（TEXT/TABLE/GARBLED/SCAN/GRAPHIC）
 #   → transcribe.py 对乱码/扫描/图纸页做 VLM 转录回填 page_texts
-#   → 落盘 .cache/<sha>/index.json（含 page_texts 目录 + pages/ 渲染图 + files.json）
+#   → 落盘 .cache/<sha>/index.json（含 page_texts 目录 + pages/ 渲染图）
+#   → file 模式额外保存 files.json；image_url 模式不使用 Files API
 ```
 
 - 重复运行命中缓存，瞬间返回；`--force` 重建、`--clean` 清缓存
@@ -100,19 +121,19 @@ deepseek-v4-flash-vision-rag/
 ├── README.md                # 本文件
 ├── scripts/
 │   ├── agentic_tools.py     # 人式工具集：scan_index / read_vision / read_text / search_pages / verify_quote
-│   ├── ds_client.py         # DeepSeek VLM 客户端（read_vision 依赖）
+│   ├── ds_client.py         # 可切换模型和图片输入模式的 VLM 客户端
 │   ├── ingest.py            # 建索引（→ router + transcribe）；scan_index 的索引来源
 │   ├── router.py            # 页分类器（ingest 依赖）
 │   ├── transcribe.py        # 乱码/扫描/图纸页 VLM 转录（ingest 依赖）
 │   ├── show.py              # 指定页高清渲染（展示用）
 │   └── _inspect_cache.py    # 缓存检查小工具
 ├── references/
-│   ├── api-notes.md         # DeepSeek API 实测要点与坑（改代码前必读）
+│   ├── api-notes.md         # 视觉 API 实测要点与坑（改代码前必读）
 │   └── index-schema.md      # .cache 索引 JSON 结构、提示词、缓存机制
 └── .cache/                  # 预建索引（按 PDF 内容哈希分目录；scan_index 第 1 步优先查这里）
     └── <sha256前16位>/
         ├── index.json        # 每页转录文本 page_texts + 页目录（type/headings/keywords/summary）+ 大纲
-        ├── files.json        # 页码 → Files API file_id 映射
+        ├── files.json        # 仅 file 模式：页码 → Files API file_id 映射
         └── pages/p0001.png   # 每页渲染图
 ```
 

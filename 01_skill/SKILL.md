@@ -1,9 +1,9 @@
 ---
 name: deepseek-v4-flash-vision-rag
-description: 基于DeepSeek视觉大模型（deepseek-v4-flash-vision-exp）的PDF深度问答（人式读文档 Vision RAG）。当用户提到 PDF、文档、资料、报告、论文、电子书、手册、说明书、图纸、表格，并想提问、查找、搜索、总结或理解其内容，或问"在哪一页"、"引用原文"、要页面截图时，使用本skill。支持扫描版、图表、图纸、表格、代码的视觉理解；回答带物理页码引用，并把命中页原图展示给用户。
+description: 基于可切换的 OpenAI 兼容视觉模型（默认 deepseek-v4-flash-vision-exp）的 PDF 深度问答（人式读文档 Vision RAG）。当用户提到 PDF、文档、资料、报告、论文、电子书、手册、说明书、图纸、表格，并想提问、查找、搜索、总结或理解其内容，或问"在哪一页"、"引用原文"、要页面截图时，使用本 skill。支持扫描版、图表、图纸、表格、代码的视觉理解；回答带物理页码引用，并把命中页原图展示给用户。
 ---
 
-# DeepSeek V4-Flash Vision RAG（人式读文档）
+# 可切换视觉模型 Vision RAG（人式读文档）
 
 ## 核心原则：你就是那个读文档的人
 
@@ -144,12 +144,16 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 ## 环境
 
 - Python 依赖：`openai`、`pymupdf(fitz)`（本机已装）
-- API key：从环境变量 `DEEPSEEK_API_KEY` 或本机 `~/.deepseek_api_key` 文件（首行）读取
+- API key：优先从 `VISION_API_KEY`、`DEEPSEEK_API_KEY`、`CLIPROXY_API_KEY`、`LOCAL_OPENAI_API_KEY`、`OPENAI_API_KEY` 读取，也兼容本机 `~/.deepseek_api_key` 文件首行
+- 模型：默认 `deepseek-v4-flash-vision-exp`，可用 `VISION_MODEL` 或调用参数覆盖
+- 接口：默认 `https://api.deepseek.com`，可用 `VISION_BASE_URL` 或调用参数覆盖
+- 图片输入：默认 `file`，可选 `image_url`；可用 `VISION_INPUT_MODE` 或调用参数覆盖
+- `file` 模式使用 Files API；`image_url` 模式使用远程 URL/data URL，或将本地图片转为 Base64 data URL
 - 核心工具（人式流程直接调用）：`scripts/agentic_tools.py`
   - `scan_index(pdf, keywords)` 查目录（**索引优先**：预建索引秒回，无索引降级即时扫描）
     ｜`read_vision(pdf, page0, instr)` 看图（眼睛）
     ｜`read_text(pdf, page0)` 看文本层｜`search_pages(pdf, query)` 兜底检索｜`verify_quote(...)` 自检
-  - 依赖 `scripts/ds_client.py`（DeepSeek VLM 客户端，由 `read_vision` 调用）
+  - 依赖 `scripts/ds_client.py`（可切换视觉模型的客户端，由 `read_vision` 调用）
 - **建索引工具（人式流程的标准前置步骤）**：`scripts/ingest.py` → `router.py`（页分类）
   + `transcribe.py`（视觉转录）→ 落盘 `.cache/<sha>/index.json`（每页转录文本 + 页标题/类型/摘要）。
   新 PDF 建议先 ingest 预建，`scan_index` 即可秒查索引、且覆盖乱码/扫描页；无索引时自动降级即时扫描。
@@ -157,5 +161,5 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 
 ## 其他参考
 
-- `references/api-notes.md`：API 细节（推理开关、384 token/图、Files API 限制等坑）
+- `references/api-notes.md`：API 细节（推理开关、384 token/图、Files API 与 `image_url` 限制等坑）
 - `references/index-schema.md`：索引/缓存结构

@@ -1,7 +1,7 @@
 # Enterprise RAG Challenge —— 人式读文档视觉 RAG 方案
 
 > 让 AI **像人一样翻开一份 PDF**：查目录 → 看图 → 深挖 → 带页码引用给答案。
-> 基于 DeepSeek 视觉模型 `deepseek-v4-flash-vision-exp`，支持文字版／扫描版／图表／表格／公式年报。
+> 基于可切换的 OpenAI 兼容视觉模型（默认 `deepseek-v4-flash-vision-exp`），支持文字版／扫描版／图表／表格／公式年报。
 
 
 ---
@@ -112,7 +112,7 @@ enterprise-rag-challenge-release/
 │   ├── scripts/
 │   │   ├── agentic_tools.py        人式工具集：scan_index / read_vision / read_text
 │   │   │                          / search_pages / verify_quote
-│   │   ├── ds_client.py            DeepSeek VLM 客户端（read_vision 依赖）
+│   │   ├── ds_client.py            可切换模型与图片输入模式的 VLM 客户端
 │   │   ├── show.py                 指定页高清渲染
 │   │   ├── ingest.py → router.py + transcribe.py   [可选] 一次性预建索引（非人式必需）
 │   │   └── _human_demo/            教学示例图（SKILL.md 引用）
@@ -145,7 +145,24 @@ enterprise-rag-challenge-release/
 
 ```bash
 pip install openai pymupdf
-# API key：环境变量 DEEPSEEK_API_KEY，或写入 ~/.deepseek_api_key 首行
+# 默认 DeepSeek：
+export DEEPSEEK_API_KEY='...'
+# 也可以统一配置任意 OpenAI 兼容视觉接口：
+export VISION_API_KEY='...'
+export VISION_BASE_URL='http://localhost:8317/v1'
+export VISION_MODEL='gpt-5.6-luna'
+export VISION_INPUT_MODE='image_url'
+```
+
+图片输入有两种模式：`file` 使用 Files API 上传并缓存 `file_id`；`image_url` 使用远程 URL、data URL，或把本地图片转换为 Base64 data URL，不访问 Files API。默认模式为 `file`，可用 `VISION_INPUT_MODE` 或命令行参数切换；不做自动 fallback。
+
+预建索引时也可逐次覆盖模型、接口和输入模式：
+
+```bash
+python 01_skill/scripts/ingest.py "你的文件.pdf" --route vision \
+  --model gpt-5.6-luna \
+  --base-url http://localhost:8317/v1 \
+  --input-mode image_url
 ```
 
 **答题（人式，一题一题读）**

@@ -4,14 +4,15 @@
 1. PyMuPDF 渲染每页为 PNG（150dpi，自动钳制在单边 3600px 内，
    满足"单请求 15+ 图时单边 ≤4096px"的限制；单图 token 封顶 384，无需更高分辨率）
 2. 抽取每页文本层（零成本，供本地关键词检索与深读引用）
-3. Files API 并发上传所有页图 → file_id 清单（断点续传）
-4. 分批（默认 25 页/请求）把页图 file_id 打包给 vision 模型，
+3. 按 ``--input-mode`` 准备图片：Files API 并发上传并缓存 file_id，或直接生成 image_url
+4. 分批（默认 25 页/请求）把页图消息块打包给 vision 模型，
    关闭推理 + JSON Output，产出每页结构化记录；截断/失败自动对半拆批重试
 5. 由页级 headings 派生全书大纲（不需要 PageIndex 式的页码映射与修复循环）
 6. 落盘 .cache/<sha256>/index.json
 
 用法：
-  python ingest.py <pdf> [--force] [--limit N] [--batch 25] [--dpi 150] [--workers 6] [--clean]
+  python ingest.py <pdf> [--force] [--limit N] [--batch 25] [--dpi 150] [--workers 6]
+                       [--model MODEL] [--base-url URL] [--input-mode file|image_url] [--clean]
 """
 import argparse
 import concurrent.futures
@@ -24,7 +25,7 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 
-from ds_client import DSClient, ChatError
+from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -77,7 +78,15 @@ def save_json(path: Path, data):
 
 
 def upload_all(client: DSClient, page_files, files_json: Path, workers: int):
-    """并发上传页图，断点续传（files.json 已有的页跳过）。返回 {页码str: file_id}。"""
+    """准备索引页图片来源，返回 ``{页码str: file_id或本地路径}``。
+
+    ``file`` 模式并发上传并复用 files.json；``image_url`` 模式不访问 Files API，
+    直接返回本地 PNG 路径，后续由 DSClient 转成 data URL。
+    """
+    if client.input_mode == "image_url":
+        print("[upload] input_mode=image_url; skip Files API", flush=True)
+        return {str(i + 1): str(p) for i, p in enumerate(page_files)}
+
     files_map = json.loads(files_json.read_text("utf-8")) if files_json.exists() else {}
     todo = {i + 1: p for i, p in enumerate(page_files) if str(i + 1) not in files_map}
     if not todo:
@@ -118,30 +127,35 @@ def normalize_record(rec: dict, page: int) -> dict:
     return rec
 
 
-def batch_blocks(pages, files_map):
+def batch_blocks(client: DSClient, pages, image_sources):
+    """按客户端输入模式构造一批带页码的图片消息块。"""
     blocks = []
     for p in pages:
         blocks.append({"type": "text", "text": f"[第{p}页]"})
-        blocks.append({"type": "file", "file_id": files_map[str(p)]})
+        source = image_sources[str(p)]
+        if client.input_mode == "file":
+            blocks.append(client.build_file_block(source))
+        else:
+            blocks.append(client.build_image_block(source))
     blocks.append({"type": "text",
                    "text": f"请输出第{pages[0]}页到第{pages[-1]}页（共{len(pages)}页）每一页的JSON记录。"})
     return blocks
 
 
-def index_pages(client: DSClient, pages, files_map):
+def index_pages(client: DSClient, pages, image_sources):
     """索引一组页。截断/解析失败时对半拆批递归；返回拿到的 {页码: record}。"""
     if not pages:
         return {}
     try:
-        data, finish = client.chat_json(batch_blocks(pages, files_map), system=INDEX_SYSTEM,
+        data, finish = client.chat_json(batch_blocks(client, pages, image_sources), system=INDEX_SYSTEM,
                                         thinking=False, max_tokens=8192)
     except ChatError as e:
         if len(pages) == 1:
             print(f"[index] page {pages[0]} failed: {e}", flush=True)
             return {}
         mid = len(pages) // 2
-        return {**index_pages(client, pages[:mid], files_map),
-                **index_pages(client, pages[mid:], files_map)}
+        return {**index_pages(client, pages[:mid], image_sources),
+                **index_pages(client, pages[mid:], image_sources)}
 
     records = {}
     raw = data.get("pages") if isinstance(data, dict) else data
@@ -155,11 +169,11 @@ def index_pages(client: DSClient, pages, files_map):
     if finish == "length" and len(pages) > 1:
         mid = len(pages) // 2
         print(f"[index] batch p{pages[0]}-{pages[-1]} truncated, splitting", flush=True)
-        records.update(index_pages(client, pages[:mid], files_map))
-        records.update(index_pages(client, pages[mid:], files_map))
+        records.update(index_pages(client, pages[:mid], image_sources))
+        records.update(index_pages(client, pages[mid:], image_sources))
     elif missing and len(missing) < len(pages):
         # 模型漏了几页，只补漏掉的
-        records.update(index_pages(client, missing, files_map))
+        records.update(index_pages(client, missing, image_sources))
     return records
 
 
@@ -186,6 +200,10 @@ def main():
     ap.add_argument("--batch", type=int, default=25, help="每次请求的页数")
     ap.add_argument("--dpi", type=int, default=150)
     ap.add_argument("--workers", type=int, default=6, help="上传并发数")
+    ap.add_argument("--model", default=None, help="视觉模型 ID，默认读取 VISION_MODEL")
+    ap.add_argument("--base-url", default=None, help="OpenAI 兼容接口地址，默认读取 VISION_BASE_URL")
+    ap.add_argument("--input-mode", choices=SUPPORTED_INPUT_MODES, default=None,
+                    help="图片输入模式：file 或 image_url，默认读取 VISION_INPUT_MODE")
     ap.add_argument("--clean", action="store_true", help="删除该 PDF 的本地缓存后退出")
     ap.add_argument("--route", choices=("auto", "vision", "text"), default="auto",
                     help="auto=自适应路由(默认,文本直录+图纸/乱码/扫描VLM转录); "
@@ -224,7 +242,7 @@ def main():
     print(f"[ingest] {pdf.name}: {total} pages, indexing {n_pages}, route={args.route}, sha={sha[:16]}", flush=True)
     t0 = time.time()
 
-    client = DSClient()
+    client = DSClient(base_url=args.base_url, model=args.model, input_mode=args.input_mode)
     texts = [doc[i].get_text() for i in range(n_pages)]
 
     if args.route == "auto":
@@ -272,7 +290,7 @@ def main():
             "pdf": str(pdf), "pdf_name": pdf.name, "sha256": sha,
             "model": client.model, "created": datetime.now().isoformat(timespec="seconds"),
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
-            "route": "auto",
+            "route": "auto", "input_mode": client.input_mode,
             "pages": ordered,
             "page_texts": [text_map.get(p, "") or texts[p - 1] for p in range(1, n_pages + 1)],
             "outline": [],
@@ -295,7 +313,8 @@ def main():
             "pdf": str(pdf), "pdf_name": pdf.name, "sha256": sha,
             "model": client.model, "created": datetime.now().isoformat(timespec="seconds"),
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
-            "route": "text", "pages": ordered, "page_texts": texts, "outline": [],
+            "route": "text", "input_mode": client.input_mode, "pages": ordered,
+            "page_texts": texts, "outline": [],
         }
         save_json(index_path, index)
         print(f"[done] text-only index: {n_pages} 页 ({time.time()-t0:.0f}s) -> {index_path}", flush=True)
@@ -306,14 +325,15 @@ def main():
     page_files = render_pages(doc, pages_dir, args.dpi)[:n_pages]
     print(f"[render] {len(page_files)} pages -> {pages_dir} ({time.time() - t0:.0f}s)", flush=True)
 
-    files_map = upload_all(client, page_files, cache_dir / "files.json", args.workers)
-    print(f"[upload] {len(files_map)} file_ids ready ({time.time() - t0:.0f}s)", flush=True)
+    image_sources = upload_all(client, page_files, cache_dir / "files.json", args.workers)
+    source_label = "file_ids" if client.input_mode == "file" else "image_url sources"
+    print(f"[upload] {len(image_sources)} {source_label} ready ({time.time() - t0:.0f}s)", flush=True)
 
     records = {}
     all_pages = list(range(1, n_pages + 1))
     for i in range(0, n_pages, args.batch):
         chunk = all_pages[i:i + args.batch]
-        got = index_pages(client, chunk, files_map)
+        got = index_pages(client, chunk, image_sources)
         records.update(got)
         print(f"[index] {min(len(records), i + len(chunk))}/{n_pages} done "
               f"(p{chunk[0]}-p{chunk[-1]}, {time.time() - t0:.0f}s)", flush=True)
@@ -335,6 +355,7 @@ def main():
         "pdf_name": pdf.name,
         "sha256": sha,
         "model": client.model,
+        "input_mode": client.input_mode,
         "created": datetime.now().isoformat(timespec="seconds"),
         "total_pages": total,
         "pages_indexed": n_pages,

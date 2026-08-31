@@ -1,6 +1,6 @@
 """transcribe.py —— VLM 视觉转录（补盲区核心）
 
-对 router 标出的 GARBLED / SCAN / GRAPHIC 页，渲染 → 上传 → VLM 看图转录，
+对 router 标出的 GARBLED / SCAN / GRAPHIC 页，渲染 → 按配置准备图片 → VLM 看图转录，
 产出完整可检索文本，回填索引的 page_texts（原始文本层不可用的页从此可被检索）。
 
 按页类型切换提示词：
@@ -13,13 +13,14 @@
     text_map = transcribe_pages(client, pdf_path, {page: label}, cache_dir)
 """
 import json
+import argparse
 import sys
 import time
 from pathlib import Path
 
 import fitz
 
-from ds_client import DSClient, ChatError
+from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -66,7 +67,15 @@ def _render_missing(pdf: Path, pages: list, pages_dir: Path, dpi: int = 150):
 
 
 def _upload(client: DSClient, page_pngs: dict, files_json: Path, workers: int = 4):
-    """上传缺失页图（files.json 断点续传）。返回 {页码str: file_id}。"""
+    """准备缺失页图，返回 ``{页码str: file_id或本地路径}``。
+
+    ``file`` 模式使用 files.json 断点续传；``image_url`` 模式跳过上传，
+    直接把本地路径交给 DSClient 转成 data URL。
+    """
+    if client.input_mode == "image_url":
+        print("  [upload] input_mode=image_url; skip Files API", flush=True)
+        return {str(p): str(png) for p, png in page_pngs.items()}
+
     import concurrent.futures
     files_map = json.loads(files_json.read_text("utf-8")) if files_json.exists() else {}
     todo = {p: png for p, png in page_pngs.items() if str(p) not in files_map}
@@ -99,13 +108,13 @@ def transcribe_pages(client: DSClient, pdf: Path, labels: dict,
     """转录 labels 指定的页（{page: GARBLED|SCAN|GRAPHIC}）。
 
     返回 {page: 转录文本}。单页失败不影响其余（记入失败列表）。
-    缓存：渲染 PNG 与 files.json 落在 cache_dir，重复运行零成本。
+    缓存：渲染 PNG 落在 cache_dir；仅 ``file`` 模式额外复用 files.json，重复运行零成本。
     """
     if not labels:
         return {}
     pages_dir = cache_dir / "pages"
     pngs = _render_missing(pdf, sorted(labels), pages_dir, dpi)
-    files_map = _upload(client, pngs, cache_dir / "files.json", workers)
+    image_sources = _upload(client, pngs, cache_dir / "files.json", workers)
 
     out, failed = {}, []
     ordered = sorted(labels.items())          # 按页序，天然同类型相邻
@@ -115,7 +124,11 @@ def transcribe_pages(client: DSClient, pdf: Path, labels: dict,
         blocks = []
         for p, lab in chunk:
             blocks.append({"type": "text", "text": f"[第{p}页] {lab}"})
-            blocks.append({"type": "file", "file_id": files_map[str(p)]})
+            source = image_sources[str(p)]
+            if client.input_mode == "file":
+                blocks.append(client.build_file_block(source))
+            else:
+                blocks.append(client.build_image_block(source))
         blocks.append({"type": "text", "text": f"请处理第{chunk[0][0]}页到第{chunk[-1][0]}页。"})
         labs = {lab for _, lab in chunk}
         try:
@@ -171,13 +184,21 @@ def transcribe_pages(client: DSClient, pdf: Path, labels: dict,
 
 
 if __name__ == "__main__":
-    # 自检用法：python transcribe.py <pdf> p1,p2,p3 GARBLED
-    pdf = Path(sys.argv[1])
-    pages = {int(x) for x in sys.argv[2].split(",")}
-    lab = sys.argv[3] if len(sys.argv) > 3 else "GARBLED"
-    client = DSClient()
+    # 自检用法：python transcribe.py <pdf> p1,p2,p3 GARBLED [--model MODEL]
+    ap = argparse.ArgumentParser(description="Transcribe selected PDF pages with a vision model")
+    ap.add_argument("pdf", type=Path)
+    ap.add_argument("pages", help="页码，逗号分隔，例如 1,2,3")
+    ap.add_argument("label", nargs="?", default="GARBLED")
+    ap.add_argument("--model", default=None, help="视觉模型 ID，默认读取 VISION_MODEL")
+    ap.add_argument("--base-url", default=None, help="OpenAI 兼容接口地址，默认读取 VISION_BASE_URL")
+    ap.add_argument("--input-mode", choices=SUPPORTED_INPUT_MODES, default=None,
+                    help="图片输入模式：file 或 image_url，默认读取 VISION_INPUT_MODE")
+    args = ap.parse_args()
+    pdf = args.pdf
+    pages = {int(x) for x in args.pages.split(",")}
+    client = DSClient(base_url=args.base_url, model=args.model, input_mode=args.input_mode)
     cache = Path(__file__).resolve().parent / ".cache" / "transcribe_test"
-    text_map = transcribe_pages(client, pdf, {p: lab for p in pages}, cache)
+    text_map = transcribe_pages(client, pdf, {p: args.label for p in pages}, cache)
     for p, t in text_map.items():
         print(f"=== p{p} 转录前 300 字 ===")
         print(t[:300])

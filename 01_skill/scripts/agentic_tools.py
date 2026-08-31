@@ -263,15 +263,20 @@ def read_text(pdf_path, page: int, max_chars: int = 8000) -> str:
 # ---------------------------------------------------------------------------
 def read_vision(pdf_path, page: int, instruction: str,
                 cache_dir: Path | None = None, dpi: int = 150,
-                client=None) -> str:
-    """渲染指定页为 PNG，上传后让 VLM 看图并按 instruction 处理。
+                client=None, model=None, base_url=None, input_mode=None,
+                detail="high") -> str:
+    """渲染指定页为 PNG，按配置让 VLM 看图并按 instruction 处理。
 
     instruction 完全由 AI 构造，例如：
       - "这页文本层是乱码，请逐字朗读整页内容（含表格数字）"
       - "这是一张工程图纸，请列出所有文字标注、尺寸/数值（带单位）、图例"
       - "这是表格页，请输出完整 Markdown 表格，数字逐格核对"
       - "请只看这张图回答：报告中披露的 X 指标数值是多少？"
-    返回 VLM 的文本结果。渲染 PNG 缓存于 cache_dir（默认 scripts/.cache/tools/）。
+    参数：
+      model/base_url/input_mode —— 未传 client 时覆盖 DSClient 的默认配置；
+      input_mode 可选 ``file`` 或 ``image_url``；detail 是 image_url 模式的视觉细节级别。
+    返回：
+      VLM 的文本结果。渲染 PNG 缓存于 cache_dir（默认 scripts/.cache/tools/）。
     """
     import fitz
     from ds_client import DSClient
@@ -289,11 +294,11 @@ def read_vision(pdf_path, page: int, instruction: str,
     doc.close()
 
     if client is None:
-        client = DSClient()
-    file_id = client.upload_image(str(png))
+        client = DSClient(model=model, base_url=base_url, input_mode=input_mode)
+    image_block = client.build_image_block(str(png), input_mode=input_mode, detail=detail)
     blocks = [
         {"type": "text", "text": instruction},
-        {"type": "file", "file_id": file_id},
+        image_block,
     ]
     data, _ = client.chat(blocks, thinking=False, max_tokens=4096, retries=3)
     return (data or "").strip()

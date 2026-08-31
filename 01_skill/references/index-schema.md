@@ -8,6 +8,7 @@
   "pdf_name": "test.pdf",
   "sha256": "全文哈希，缓存键",
   "model": "deepseek-v4-flash-vision-exp",
+  "input_mode": "file",          // file 或 image_url
   "created": "ISO 时间",
   "total_pages": 120,          // PDF 实际页数
   "pages_indexed": 120,        // 已索引页数（--limit 时小于 total_pages）
@@ -29,7 +30,8 @@
 
 同目录下：
 - `pages/p0001.png ...` —— 每页渲染图（150dpi，单边 ≤3600px）
-- `files.json` —— `{"1": "file-api-..."}` 页码 → Files API file_id（断点续传依据）
+- `files.json` —— 仅 `input_mode=file` 时生成：`{"1": "file-api-..."}` 页码 → Files API file_id（断点续传依据）
+  `input_mode=image_url` 直接把本地 PNG 转成 data URL，不生成或读取该文件。
 
 ## 核心提示词
 
@@ -53,7 +55,7 @@
 
 - 缓存键 = PDF 内容 sha256 前 16 位；PDF 改动即另起缓存。
 - `ingest.py --force` 重建索引（复用已上传文件）；`--clean` 删本地缓存。
-- Files API 文件默认永久有效；`read_vision` / `ingest` 上传前会校验 file_id，失效自动重传。
+- Files API 文件默认永久有效；`file` 模式下 `read_vision` / `ingest` 上传前会校验 file_id，失效自动重传。
 - 想彻底清理服务端文件：`client.files.list()` 后对不再被任何 files.json 引用的
   `file-api-...` 调 `client.files.delete(fid)`。
 
@@ -69,4 +71,4 @@
 
 - `page_texts` 对 GARBLED/SCAN/GRAPHIC 页存放**转录文本**（不再是 PyMuPDF 原始垃圾/空），
   因此这些页可被本地检索命中（消除盲区）
-- 转录由 `scripts/transcribe.py` 完成；渲染 PNG 与 file_id 复用 `.cache/<sha>/`
+- 转录由 `scripts/transcribe.py` 完成；渲染 PNG 复用 `.cache/<sha>/`，`file` 模式同时复用 file_id，`image_url` 模式不上传。

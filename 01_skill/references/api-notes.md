@@ -1,7 +1,32 @@
-# DeepSeek Vision API 实测笔记
+# 视觉模型 API 实测笔记
 
-模型 `deepseek-v4-flash-vision-exp`，base_url `https://api.deepseek.com`，OpenAI 兼容。
-以下全部经过本项目实测验证（2026-08），修改 `ds_client.py` 前务必先读本文。
+默认模型为 `deepseek-v4-flash-vision-exp`，base_url `https://api.deepseek.com`，OpenAI 兼容。
+`ds_client.py` 也支持切换到其它 OpenAI 兼容模型和本地网关。以下全部经过本项目实测验证（2026-08），
+修改 `ds_client.py` 前务必先读本文。
+
+## 输入配置
+
+环境变量（调用参数和 CLI 参数优先于环境变量）：
+
+| 配置 | 默认值 | 说明 |
+|---|---|---|
+| `VISION_MODEL` | `deepseek-v4-flash-vision-exp` | 视觉模型 ID |
+| `VISION_BASE_URL` | `https://api.deepseek.com` | OpenAI 兼容 Base URL |
+| `VISION_INPUT_MODE` | `file` | `file` 或 `image_url` |
+| `VISION_API_KEY` | 无 | 也兼容 `DEEPSEEK_API_KEY`、`CLIPROXY_API_KEY`、`LOCAL_OPENAI_API_KEY`、`OPENAI_API_KEY` |
+
+两种图片块格式：
+
+```json
+{"type": "file", "file_id": "file-api-..."}
+```
+
+```json
+{"type": "image_url", "image_url": {"url": "https://example.com/page.png", "detail": "high"}}
+```
+
+`image_url` 的 `url` 也可以是 `data:image/png;base64,...`；传入本地图片路径时，客户端会自动编码为 data URL。
+远程 URL 和已有 data URL 原样传递。用户显式选择的模式会被严格使用，不做自动 fallback。
 
 ## 关键坑（都踩过）
 
@@ -39,6 +64,12 @@
 - openai SDK 的 `files.create()` **不接受 `expires_after`**（会 TypeError），
   文件默认永久有效；配额 25GiB / 10000 个文件，足够。
 - `files.retrieve(fid)` 可校验存在性（免费、不耗 token）——`read_vision` / `ingest` 用它做失效重传。
+
+### 6. `image_url` 与本地网关
+
+- `image_url` 模式不调用 Files API，不创建或读取 `files.json`；适合未实现 `/v1/files` 的 OpenAI 兼容网关。
+- 本地图片会计入请求体的 Base64 大小限制；单图建议控制在 32MiB 以内。
+- 本机 `http://localhost:8317/v1` 当前已实测 `gpt-5.6-luna` 的 `image_url` 请求可用；该结论不代表其它模型或 `file` 模式一定可用，仍需真实 completion 验证。
 
 ## 设计决策（为什么这样做）
 
