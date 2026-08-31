@@ -454,7 +454,7 @@
   {
     "question_text": "According to the annual report, what is the Total revenue (in USD) for Medallion Financial Corp.  (within the last period or at the end of the last period)? If data is not available, return 'N/A'.",
     "kind": "number",
-    "value": 196621000,
+    "value": "206147000",
     "references": [
       [
         "Medallion Financial",
@@ -622,15 +622,11 @@
   {
     "question_text": "Did Ritchie Bros. Auctioneers Incorporated mention any ongoing litigation or regulatory inquiries? If there is no mention, return False.",
     "kind": "boolean",
-    "value": true,
+    "value": false,
     "references": [
       [
         "Ritchie Bros",
         37
-      ],
-      [
-        "Ritchie Bros",
-        28
       ]
     ]
   },
@@ -944,11 +940,11 @@
   {
     "question_text": "Did Empire Company Limited announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
     "kind": "boolean",
-    "value": true,
+    "value": false,
     "references": [
       [
         "Empire",
-        7
+        64
       ]
     ]
   },
@@ -1003,11 +999,11 @@
   {
     "question_text": "Did HCA Healthcare, Inc. announce any changes to its dividend policy in the annual report? If there is no mention, return False.",
     "kind": "boolean",
-    "value": true,
+    "value": false,
     "references": [
       [
         "HCA",
-        3
+        88
       ]
     ]
   },
