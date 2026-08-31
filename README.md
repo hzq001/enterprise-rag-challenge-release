@@ -3,9 +3,99 @@
 > 让 AI **像人一样翻开一份 PDF**：查目录 → 看图 → 深挖 → 带页码引用给答案。
 > 基于 DeepSeek 视觉模型 `deepseek-v4-flash-vision-exp`，支持文字版／扫描版／图表／表格／公式年报。
 
-本发布包只含**当前方案**（人式读文档）。旧版的文本 RAG 批量流水线
-（`round1_solve.py`、`r2_solve.py`、61 份 text_index、round1 时代方法论）已全部移除，
-归档于 `../_archive/enterprise-rag-challenge-release_round1-2_*/`（确认无用后可删）。
+
+---
+
+
+## Enterprise RAG Challenge・Round1 挑战详解与解决方案
+
+> 本文档基于对 
+>
+> `enterprise-rag-challenge-main/round2/`
+>
+>  全部资料（README、questions.json、answers.json、main.py、rank.py、teams.py、scores.csv、100 份年报 PDF、dataset.csv）的深度解析，并结合 
+>
+> `deepseek-v4-flash-vision-rag`
+>
+>  skill 的能力，给出挑战 round2 的完整分析与可执行方案。
+
+
+
+***
+
+## 1. 挑战背景
+
+**Enterprise RAG Challenge** 是由 TIMETOACT GROUP Austria 举办的全球性 RAG（检索增强生成）竞赛：给出一批公开公司的年报 PDF，参赛系统需检索 PDF 内容回答预设问题，答案必须带物理页码引用（证明不是幻觉）。Round1 是试水轮：规模小、问题由模板生成、掺杂大量 "陷阱题"。
+
+## 2. 数据构成
+
+
+
+| 项目     | 数量   | 说明                                                        |
+| ------ | ---- | --------------------------------------------------------- |
+| 年报 PDF | 20 份 | 对应 20 家上市公司，文件名 = 文件 sha1                                 |
+| 问题     | 40 题 | schema 分 `number` / `name` / `boolean` 三类                 |
+| 公司映射   | 20 家 | 由 `round1/dataset.csv`（sha1, date, company\_name, size）还原 |
+| 历史成绩   | 若干   | `round1/scores.csv`，最高 84 分（Daniel Weller）                |
+
+### 2.1 20 份 PDF → 公司映射
+
+
+
+| sha1      | 公司                                           | 报告覆盖期             |
+| --------- | -------------------------------------------- | ----------------- |
+| 194000c9… | Holley Inc.                                  | FY2022（2023-03 报） |
+| 2779336b… | Tradition                                    | 2022-12           |
+| 43437bcc… | ENRG ELEMENTS LIMITED                        | 2022-06           |
+| 6054ec55… | MITSUI O.S.K. LINES                          | 2022-03           |
+| 609042c6… | Petra Diamonds                               | 2022-06           |
+| 84749ef5… | BAKER STEEL RESOURCES TRUST LIMITED          | 2022-12           |
+| 85fb23ba… | TransUnion                                   | FY2021（2022-01 报） |
+| 9d7a7244… | TSX\_Y                                       | 2022-01           |
+| a706b44b… | Oesterreichische Kontrollbank                | 2022-01           |
+| a8077fe1… | PowerFleet                                   | FY2022（2023-03 报） |
+| ac9aa244… | Mercia Asset Management PLC                  | 2022-01           |
+| ba5852cb… | Caixa Geral de Depósitos                     | 2022-12           |
+| cbd8fb25… | Tower Semiconductor Ltd.                     | 2023-12           |
+| e0d6bb57… | Creative Media & Community Trust Corporation | 2023-03           |
+| e2b19d2c… | CrossFirst Bank                              | 2022-12           |
+| e33544bd… | Sensata                                      | 2022-01           |
+| e62b2ebe… | Sleep Country Canada Holdings Inc.           | 2022-01           |
+| e765cdd4… | First Mid Bancshares                         | 2022-12           |
+| f06d7ecc… | Safe & Green Holdings Corp.                  | 2023-03           |
+| f721fa86… | TSX\_ACQ                                     | 2022-12           |
+
+> 注意：
+>
+> `dataset.csv`
+>
+>  的 date 字段是 "报告日期"，而问题可能问的是不同财年 —— 这是 round1 最大的陷阱来源。
+
+## 3. 计分机制（来自 `rank.py`）
+
+评分采用 Math Kangaroo 风格：
+
+
+
+* **问题分类**：按 `answers.json` 中 "有效答案集合是否包含 N/A" 区分两类 ——
+
+
+  * **N/A 类**（答案可为 N/A）：满分 **1 分**；
+
+  * **检索类**（必须给出具体值）：满分 **2 分**。
+
+* **答案匹配规则**（按 schema）：
+
+
+  * `number`：与真值误差 **<1% 得全分（× 满分），<10% 得半分（×0.5）**；
+
+  * `name`：字符串**精确匹配**（大小写敏感）得全分；
+
+  * `boolean`：二值精确匹配得全分。
+
+* 若真值有多个有效答案（如 `["N/A", 值]`），取参赛者得分最高者。
+
+* 最终得分 = `100 × 实际得分 / 满分`。
 
 ---
 
