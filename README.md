@@ -12,13 +12,14 @@
 > 本文档基于对 
 >
 > `enterprise-rag-challenge-main/round2/`
->
+> 
 >  全部资料（README、questions.json、answers.json、main.py、rank.py、teams.py、scores.csv、100 份年报 PDF、dataset.csv）的深度解析，并结合 
 >
 > `deepseek-v4-flash-vision-rag`
 >
 >  skill 的能力，给出挑战 round2 的完整分析与可执行方案。
 
+挑战赛具体数据和说明：https://github.com/trustbit/enterprise-rag-challenge
 
 
 ***
