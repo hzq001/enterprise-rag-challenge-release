@@ -7,7 +7,7 @@
 ---
 
 
-## Enterprise RAG Challenge・Round1 挑战详解与解决方案
+## Enterprise RAG Challenge・Round2 挑战详解与解决方案
 
 > 本文档基于对 
 >
@@ -25,7 +25,7 @@
 
 ## 1. 挑战背景
 
-**Enterprise RAG Challenge** 是由 TIMETOACT GROUP Austria 举办的全球性 RAG（检索增强生成）竞赛：给出一批公开公司的年报 PDF，参赛系统需检索 PDF 内容回答预设问题，答案必须带物理页码引用（证明不是幻觉）。Round1 是试水轮：规模小、问题由模板生成、掺杂大量 "陷阱题"。
+**Enterprise RAG Challenge** 是由 TIMETOACT GROUP Austria 举办的全球性 RAG（检索增强生成）竞赛：给出一批公开公司的年报 PDF，参赛系统需检索 PDF 内容回答预设问题，答案必须带物理页码引用（证明不是幻觉）。Round1 是试水轮：规模小、问题由模板生成、掺杂大量 "陷阱题"。Round2 是完整轮。 
 
 ## 2. 数据构成
 
