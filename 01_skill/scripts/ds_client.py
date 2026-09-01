@@ -82,6 +82,34 @@ def _configured_model() -> str:
     return _env_first(("VISION_MODEL", "DEEPSEEK_VISION_MODEL"), MODEL)
 
 
+def resolve_base_url(value=None) -> str:
+    """解析本次调用使用的 OpenAI 兼容接口地址。
+
+    参数：
+        value: 显式接口地址；为空时读取环境变量和默认值。
+    返回值：
+        去除首尾空白后的接口地址。
+    约束：
+        不在此处发起网络请求，也不校验接口是否可用。
+    """
+    candidate = value if value is not None and str(value).strip() else _configured_base_url()
+    return str(candidate).strip()
+
+
+def resolve_model(value=None) -> str:
+    """解析本次调用使用的视觉模型名称。
+
+    参数：
+        value: 显式模型名称；为空时读取环境变量和默认值。
+    返回值：
+        去除首尾空白后的模型名称。
+    约束：
+        只解析配置，不证明模型支持视觉输入；可用性仍需真实请求验证。
+    """
+    candidate = value if value is not None and str(value).strip() else _configured_model()
+    return str(candidate).strip()
+
+
 def _load_api_key() -> str:
     """从环境变量或本机文件读取 API key，绝不在代码中硬编码。"""
     # VISION_API_KEY 用于统一配置；其余名称保持既有本机/DeepSeek 兼容性。
@@ -155,8 +183,8 @@ class DSClient:
         约束：
             ``input_mode`` 必须是支持的图片输入模式。
         """
-        self.base_url = base_url or _configured_base_url()
-        self.model = model or _configured_model()
+        self.base_url = resolve_base_url(base_url)
+        self.model = resolve_model(model)
         self.input_mode = resolve_input_mode(input_mode)
         self.client = OpenAI(
             api_key=api_key or _load_api_key(),

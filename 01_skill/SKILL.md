@@ -63,12 +63,15 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 - **翻邻页**：找到线索页后，看它前后页（上下文往往在邻页）
 - **找数字/动词**：number 题直接扫数字，boolean 题扫 "announced/changes/effective"
 
-### 第 4 步：收敛 —— 务必得到答案
+### 第 4 步：结构化收敛与核验 —— 务必得到可复核的答案
 
-- **找到了** → 给出答案 + 页码（你亲眼看到的，不是程序推的）
-- **确实没有**（穷尽目录与邻页后）→ 明确说"查了目录哪些关键词、看了第 X-Y 页，
-  没有找到"，再答 N/A
-- 绝不因为"一次没搜到"就放弃，也不编造不存在的引用
+- **找到了** → 记录答案、原始值、单位、币种、报告期、物理页码和原文 quote；
+  number 题同时记录从原始值到题面单位的 `scale`
+- **确实没有**（穷尽目录与邻页后）→ 记录 `N/A`、`disclosure_status=not_disclosed`、
+  `search_exhausted=true` 和实际检索关键词；不能把“没有该行”填成 0
+- 最后优先调用 `verify_answer(answer, evidence_pages)`，它会检查答案契约、引用、
+  正负号、换算倍率、单位、币种和期间；验证失败就回到第 2/3 步重读
+- 绝不因为“一次没搜到”就放弃，也不编造不存在的引用
 
 ---
 
@@ -80,7 +83,8 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 | `read_vision(pdf, page0, instr)` | **看图（你的眼睛）**：渲染该页，按你的指令提取 | 第 2 步，视觉查看 |
 | `read_text(pdf, page0)` | 快速瞄一眼文本层（零成本） | 先看文字再决定要不要看图 |
 | `search_pages(pdf, query)` | 辅助检索（带词干匹配） | 目录扫不到时兜底 |
-| `verify_quote(quote, evidence, kind, value)` | 自检：引用真实存在于页面 | 出答案前核验 |
+| `verify_quote(quote, evidence, kind, value, ...)` | 校验引用、数字符号与换算 | 细粒度核验 |
+| `verify_answer(answer, evidence)` | 校验结构化答案契约与页面证据 | 出答案前强制核验 |
 
 ---
 
@@ -89,7 +93,7 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 1. **题目措辞 ≠ 年报措辞**：题问 "employees let go"，年报写 "headcount reduction"；
    题问 "leadership positions changed"，年报写 "appointed/resigned"。扫目录时主动换词。
 2. **数字题核对口径**：现金流量表取净额行；多口径并存（adjusted vs reported）时
-   取与题面最字面匹配的；注意千/百万单位。
+   取与题面最字面匹配的；注意千/百万单位，并保留 raw_value、scale、unit、currency、period。
 3. **boolean：词出现 ≠ 事件发生**（round2 实测：boolean 是最容易失分的题型，
    系统性错误是"看到相关章节就判 True"）。判定标尺——**必须有"变化"的证据**：
    - ✅ 算 True：与去年对比的数字变化（DPS +10% / dividend 0.52→0.60 且提到 policy）、
@@ -106,7 +110,8 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 4. **names 题答案在动词附近**：appointed/resigned/effective 所在的页，才是变动
    发生的地方；静态"现任名单"页不是答案。
 5. **引用必须真实**：只引用你实际读到的页；页码说清是 1 基还是 0 基。
-6. **答 N/A 前穷尽**：换 2-3 组关键词、看邻页、必要时看图；然后说明查过哪里。
+6. **答 N/A 前穷尽**：换 2-3 组关键词、看邻页、必要时看图；然后记录关键词和页码。
+   利润表没有目标指标行 → `N/A`；明确出现 `0` 或 `—` → `0`；禁止从其它行自算。
 7. **多文档比较题**：对每家公司分别走完整流程取数，再统一比较。
 
 ---
@@ -155,8 +160,10 @@ txt = T.read_vision(pdf, page0, "逐字读出这一页关于 X 的内容，包�
 - 核心工具（人式流程直接调用）：`scripts/agentic_tools.py`
   - `scan_index(pdf, keywords)` 查目录（**索引优先**：预建索引秒回，无索引降级即时扫描）
     ｜`read_vision(pdf, page0, instr)` 看图（眼睛）
-    ｜`read_text(pdf, page0)` 看文本层｜`search_pages(pdf, query)` 兜底检索｜`verify_quote(...)` 自检
+    ｜`read_text(pdf, page0)` 看文本层｜`search_pages(pdf, query)` 兜底检索
+    ｜`verify_quote(...)` 数字/引用核验｜`verify_answer(...)` 契约+证据核验
   - 依赖 `scripts/ds_client.py`（可切换视觉模型的客户端，由 `read_vision` 调用）
+  - `scripts/answer_quality.py` 提供数字解析、披露状态和答案契约校验
 - **建索引工具（人式流程的标准前置步骤）**：`scripts/ingest.py` → `router.py`（页分类）
   + `transcribe.py`（Mac OCR/VLM 转录）→ 落盘 `.cache/<sha>/index.json`（每页转录文本 + 页标题/类型/摘要）。
   新 PDF 建议先 ingest 预建，`scan_index` 即可秒查索引、且覆盖乱码/扫描页；无索引时自动降级即时扫描。

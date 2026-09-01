@@ -12,7 +12,8 @@ Agentic RAG 工具集：5 个原子能力，由 AI 主循环自主调用。
     hits = T.search_pages(pdf, "appointed director")   # 阶段2 搜索（可换词反复调）
     txt  = T.read_text(pdf, 67)                   # 读文本层
     txt  = T.read_vision(pdf, 67, "逐字朗读整页内容")  # 看图（指令由 AI 构造）
-    ok, why = T.verify_quote("...", quote, [(67, md)], "number", 112)  # 出答案前自检
+    ok, why = T.verify_quote("...", [(67, md)], "number", 112)  # 出答案前自检
+    ok, why = T.verify_answer(answer, [(67, md)])                 # 契约+证据一次核验
 """
 from __future__ import annotations
 
@@ -25,6 +26,31 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).parent
+
+try:
+    from .answer_quality import (
+        SUPPORTED_KINDS,
+        context_matches,
+        explicit_zero_matches,
+        extract_reported_numbers,
+        is_explicit_zero,
+        is_na_value,
+        numbers_match,
+        parse_reported_number,
+        validate_answer_payload,
+    )
+except ImportError:  # 直接以 python scripts/agentic_tools.py 运行时没有包上下文
+    from answer_quality import (
+        SUPPORTED_KINDS,
+        context_matches,
+        explicit_zero_matches,
+        extract_reported_numbers,
+        is_explicit_zero,
+        is_na_value,
+        numbers_match,
+        parse_reported_number,
+        validate_answer_payload,
+    )
 
 # ---------------------------------------------------------------------------
 # 索引定位（人式流程第 1 步的"目录"）：.cache/<sha256前16>/index.json
@@ -279,7 +305,10 @@ def read_vision(pdf_path, page: int, instruction: str,
       VLM 的文本结果。渲染 PNG 缓存于 cache_dir（默认 scripts/.cache/tools/）。
     """
     import fitz
-    from ds_client import DSClient
+    try:
+        from .ds_client import DSClient
+    except ImportError:  # 兼容直接以脚本或顶层模块运行
+        from ds_client import DSClient
 
     cache_dir = cache_dir or (HERE.parent / ".cache" / "tools")
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -305,17 +334,42 @@ def read_vision(pdf_path, page: int, instruction: str,
 
 
 # ---------------------------------------------------------------------------
-# 工具 7：自检 —— 出答案前的核验（防幻觉，作为工具而非强制流程）
+# 工具 7：自检 —— 出答案前的核验
 # ---------------------------------------------------------------------------
-def verify_quote(quote, evidence_pages, kind, value) -> tuple[bool, str]:
+def verify_quote(quote, evidence_pages, kind, value, *, raw_value=None, scale=1,
+                 unit=None, currency=None, period=None) -> tuple[bool, str]:
     """核验：quote 是否真实存在于某证据页、数字是否与 value 匹配。
 
     evidence_pages: [(page_index, page_text), ...]（AI 从 read_text/read_vision 收集）
     返回 (ok, reason)。ok=False 时 AI 应修正答案或改答 N/A。
-    这是防幻觉自检，由 AI 在收敛前主动调用，不是流水线强制步骤。
+    number 答案可额外传入 raw_value、scale、unit、currency、period，严格检查
+    原始值、换算倍率、单位、币种和期间；不再默认用绝对值吞掉负号。
+
+    参数：
+        quote: 模型提交的原文引用。
+        evidence_pages: ``[(page, text), ...]``，页码为调用方使用的物理页码。
+        kind: ``number``、``boolean``、``name`` 或 ``names``。
+        value: 最终答案值；number 应为已按题面单位换算后的数值。
+        raw_value: 财报表格中直接读到的原始值；不传时按 value 校验。
+        scale: ``raw_value`` 到 ``value`` 的换算倍率，默认 1。
+        unit/currency/period: 期望在证据页出现的单位、币种和报告期。
+    返回值：
+        ``(True, 说明)`` 表示通过；否则返回 ``(False, 失败原因)``。
+    异常：
+        不向调用方抛出解析异常，所有证据不一致均以 ``False`` 返回。
     """
     if not quote or not isinstance(quote, str) or len(quote.strip()) < 12:
         return False, "quote 缺失或过短"
+    if kind not in SUPPORTED_KINDS:
+        return False, f"不支持的 kind: {kind!r}"
+    if not isinstance(evidence_pages, (list, tuple)):
+        return False, "证据必须是 (page, text) 列表"
+    if kind == "boolean" and not isinstance(value, bool):
+        return False, "boolean 的 value 必须是布尔值"
+    if kind in ("name", "names") and (
+        not isinstance(value, str) or not value.strip()
+    ):
+        return False, f"{kind} 的 value 必须是非空文本"
 
     def norm(s):
         return re.sub(r"\s+", " ", re.sub(r"[*_|#`]", " ", str(s).lower())).strip()
@@ -323,29 +377,89 @@ def verify_quote(quote, evidence_pages, kind, value) -> tuple[bool, str]:
     nq = norm(quote)
     probe = nq[:70]
     hit = None
-    for p, txt in evidence_pages:
+    hit_text = ""
+    for evidence in evidence_pages:
+        if not isinstance(evidence, (list, tuple)) or len(evidence) < 2:
+            continue
+        p, txt = evidence[0], evidence[1]
         if probe and probe in norm(txt):
             hit = p
+            hit_text = str(txt or "")
             break
     if hit is None:
         return False, "quote 不在任何证据页中（疑似编造）"
 
     if kind == "number":
-        try:
-            v = abs(float(value))
-        except (TypeError, ValueError):
+        expected = parse_reported_number(value)
+        if expected is None or is_na_value(value):
             return False, "value 非数值"
-        nums = [float(m.replace(",", "")) for m in
-                re.findall(r"-?\d[\d,]*(?:\.\d+)?", nq)]
-        for c in nums:
-            c = abs(c)
-            if c == 0:
-                continue
-            for scale in (1, 1e3, 1e6, 1e9):
-                if abs(c * scale - v) <= max(1.0, v * 0.01):
-                    return True, f"已核验 @page {hit}"
-        return False, f"quote 中无匹配 {value} 的数字（quote 数字={nums[:5]}）"
+        multiplier = parse_reported_number(scale)
+        if multiplier is None or multiplier <= 0:
+            return False, "scale 必须是正数"
+        for label, expected_context in (
+            ("单位", unit),
+            ("币种", currency),
+            ("期间", period),
+        ):
+            if expected_context is not None and not context_matches(expected_context, hit_text):
+                return False, f"证据页缺少期望的{label}: {expected_context}"
+
+        raw_expected = parse_reported_number(raw_value) if raw_value is not None else None
+        raw_is_zero = raw_value is not None and is_explicit_zero(raw_value)
+        if raw_value is not None and raw_expected is None and not raw_is_zero:
+            return False, f"raw_value 非数值: {raw_value!r}"
+        nums = extract_reported_numbers(nq)
+        if raw_is_zero:
+            # 数字 0 和破折号都是财报中常见的零值表达；Markdown 的 ---
+            # 分隔线不算数据标记。
+            if expected != 0 or not explicit_zero_matches(raw_value, nq):
+                return False, "原始值声明为显式零，但引用中没有对应的零值标记"
+            return True, f"已核验 @page {hit}"
+
+        if raw_expected is not None:
+            if not any(numbers_match(raw_expected, candidate) for candidate in nums):
+                return False, f"quote 中无匹配 raw_value {raw_value} 的数字（quote 数字={nums[:8]}）"
+        if any(numbers_match(expected, candidate * multiplier) for candidate in nums):
+            return True, f"已核验 @page {hit}"
+        return False, f"quote 中无匹配 {value} 的数字（quote 数字={nums[:8]}，scale={scale}）"
     return True, f"已核验 @page {hit}"
+
+
+def verify_answer(answer, evidence_pages) -> tuple[bool, str]:
+    """一次性校验结构化答案契约和页面证据。
+
+    参数：
+        answer: ``answer_quality.validate_answer_payload`` 定义的答案对象。
+        evidence_pages: ``[(page, text), ...]``，来自实际读取的原文或视觉转录。
+    返回值：
+        ``(True, 说明)`` 表示契约和证据均通过；否则返回错误原因。
+    约束：
+        N/A 必须声明未披露、已穷尽检索并记录关键词；number 会继续校验
+        raw_value、scale、unit、currency、period 和 quote。
+    异常：
+        不向调用方抛出答案解析异常，契约错误统一返回 ``False``。
+    """
+    errors = validate_answer_payload(answer)
+    if errors:
+        return False, "；".join(errors)
+    if is_na_value(answer.get("value")):
+        return True, "已核验：按记录穷尽检索后未披露"
+    kwargs = {}
+    if answer.get("kind") == "number":
+        kwargs = {
+            "raw_value": answer.get("raw_value"),
+            "scale": answer.get("scale", 1),
+            "unit": answer.get("unit"),
+            "currency": answer.get("currency"),
+            "period": answer.get("period"),
+        }
+    return verify_quote(
+        answer.get("quote"),
+        evidence_pages,
+        answer.get("kind"),
+        answer.get("value"),
+        **kwargs,
+    )
 
 
 # ---------------------------------------------------------------------------

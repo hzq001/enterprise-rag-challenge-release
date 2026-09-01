@@ -13,16 +13,21 @@
     from transcribe import transcribe_pages
     text_map = transcribe_pages(client, pdf_path, {page: label}, cache_dir)
 """
-import json
 import argparse
 import sys
 import time
 from pathlib import Path
 
-import fitz
-
-import mac_ocr
-from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
+try:
+    from . import mac_ocr
+    from .ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
+    from .file_cache import prepare_file_sources
+    from .rendering import render_selected
+except ImportError:  # 兼容直接以 python scripts/transcribe.py 运行
+    import mac_ocr
+    from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
+    from file_cache import prepare_file_sources
+    from rendering import render_selected
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -65,20 +70,8 @@ PROMPTS = {
 
 
 def _render_missing(pdf: Path, pages: list, pages_dir: Path, dpi: int = 150):
-    """只渲染缺失的 PNG（沿用 ingest 的渲染参数，单边≤3600px）。"""
-    pages_dir.mkdir(parents=True, exist_ok=True)
-    doc = fitz.open(str(pdf))
-    out = {}
-    for p in pages:
-        png = pages_dir / f"p{p:04d}.png"
-        if not png.exists():
-            page = doc[p - 1]
-            long_side_in = max(page.rect.width, page.rect.height) / 72
-            d = max(72, min(dpi, int(3600 / long_side_in)))
-            page.get_pixmap(dpi=d).save(str(png))
-        out[p] = png
-    doc.close()
-    return out
+    """渲染缺失或 DPI/内容变化的 PNG（单边≤3600px）。"""
+    return render_selected(pdf, pages, pages_dir, dpi)
 
 
 def _upload(client: DSClient, page_pngs: dict, files_json: Path, workers: int = 4):
@@ -91,16 +84,7 @@ def _upload(client: DSClient, page_pngs: dict, files_json: Path, workers: int = 
         print("  [upload] input_mode=image_url; skip Files API", flush=True)
         return {str(p): str(png) for p, png in page_pngs.items()}
 
-    import concurrent.futures
-    files_map = json.loads(files_json.read_text("utf-8")) if files_json.exists() else {}
-    todo = {p: png for p, png in page_pngs.items() if str(p) not in files_map}
-    if todo:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-            futs = {ex.submit(client.upload_image, str(png)): p for p, png in todo.items()}
-            for fut in concurrent.futures.as_completed(futs):
-                files_map[str(futs[fut])] = fut.result()
-        files_json.write_text(json.dumps(files_map), "utf-8")
-    return files_map
+    return prepare_file_sources(client, page_pngs, files_json, workers)
 
 
 def _normalize_graphic(raw) -> str:
@@ -183,14 +167,17 @@ def transcribe_pages(client: DSClient | None, pdf: Path, labels: dict,
     image_sources = _upload(client, pngs, cache_dir / "files.json", workers)
 
     # 不把 TABLE/GRAPHIC 混在同一批里，确保各自使用正确的输出协议和提示词。
+    # 财务表格默认一页一次调用，避免多页 Markdown 输出时列值或页码串行；
+    # GARBLED/SCAN/GRAPHIC 仍可按 batch 合并以节省请求数。
     groups = {}
     for page, label in sorted(vlm_labels.items()):
         groups.setdefault(label, []).append((page, label))
     t0 = time.time()
     for label in ("GRAPHIC", "TABLE", "GARBLED", "SCAN"):
         ordered = groups.get(label, [])
-        for i in range(0, len(ordered), batch):
-            chunk = ordered[i:i + batch]
+        chunk_size = 1 if label == "TABLE" else batch
+        for i in range(0, len(ordered), chunk_size):
+            chunk = ordered[i:i + chunk_size]
             blocks = []
             for page, page_label in chunk:
                 blocks.append({"type": "text", "text": f"[第{page}页] {page_label}"})

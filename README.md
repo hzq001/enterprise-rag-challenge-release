@@ -111,8 +111,11 @@ enterprise-rag-challenge-release/
 │   ├── README.md                   skill 说明与环境配置
 │   ├── scripts/
 │   │   ├── agentic_tools.py        人式工具集：scan_index / read_vision / read_text
-│   │   │                          / search_pages / verify_quote
+│   │   │                          / search_pages / verify_answer
+│   │   ├── answer_quality.py       数字、披露状态与答案契约校验
 │   │   ├── ds_client.py            可切换模型与图片输入模式的 VLM 客户端
+│   │   ├── file_cache.py            Files API ID 与本地 PNG 摘要校验
+│   │   ├── rendering.py             带 DPI 清单的 PDF 页面 PNG 缓存
 │   │   ├── show.py                 指定页高清渲染
 │   │   ├── ingest.py → router.py + transcribe.py   [可选] 一次性预建索引（非人式必需）
 │   │   └── _human_demo/            教学示例图（SKILL.md 引用）
@@ -183,12 +186,13 @@ python 01_skill/scripts/ingest.py "你的文件.pdf" --route auto \
 **答题（人式，一题一题读）**
 
 ```python
-from scripts.agentic_tools import scan_index, read_vision, read_text, verify_quote
+from scripts.agentic_tools import scan_index, read_vision, read_text, verify_answer
 
 hits = scan_index(pdf, ["employees", "headcount"])        # 1) 查目录
 txt  = read_text(pdf, page0)                              # 2) 先瞄文本层
 ans  = read_vision(pdf, page0, "读出该页员工总数原文")      # 3) 看图（乱码/表格页必用）
-verify_quote(ans, evidence, kind, value)                  # 4) 自检后收敛
+# answer 需按 answer_quality 契约记录 value/raw_value/单位/币种/期间/quote/页码
+verify_answer(answer, [(page0 + 1, ans)])                 # 4) 契约+证据核验后收敛
 ```
 
 **评分（官方口径）**

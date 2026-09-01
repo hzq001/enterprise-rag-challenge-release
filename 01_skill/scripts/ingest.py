@@ -17,7 +17,6 @@
                        [--input-mode file|image_url] [--clean]
 """
 import argparse
-import concurrent.futures
 import hashlib
 import json
 import shutil
@@ -28,15 +27,36 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 
-import mac_ocr
-from ds_client import DSClient, ChatError, SUPPORTED_INPUT_MODES
+try:
+    from . import mac_ocr
+    from .ds_client import (
+        DSClient,
+        ChatError,
+        SUPPORTED_INPUT_MODES,
+        resolve_base_url,
+        resolve_input_mode,
+        resolve_model,
+    )
+    from .file_cache import prepare_file_sources
+    from .rendering import MAX_SIDE_PX, render_pages
+except ImportError:  # 兼容直接以 python scripts/ingest.py 运行
+    import mac_ocr
+    from ds_client import (
+        DSClient,
+        ChatError,
+        SUPPORTED_INPUT_MODES,
+        resolve_base_url,
+        resolve_input_mode,
+        resolve_model,
+    )
+    from file_cache import prepare_file_sources
+    from rendering import MAX_SIDE_PX, render_pages
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
 CACHE_ROOT = SKILL_DIR / ".cache"
-MAX_SIDE_PX = 3600  # 15+ 图/请求时 API 限制单边 4096px，留余量
 PAGE_TYPES = ("封面", "版权", "目录", "序言", "正文", "附录", "参考文献", "索引", "空白", "其他")
 
 INDEX_SYSTEM = """你是一个 PDF 页面索引助手。你会收到一批 PDF 页面图像，每张图像前有一个文本标签标明物理页码（如 [第6页]）。
@@ -63,20 +83,6 @@ def pdf_sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def render_pages(doc, out_dir: Path, dpi: int):
-    """渲染每页 PNG，返回按页码排序的文件列表。"""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    files = []
-    for i, page in enumerate(doc):
-        png = out_dir / f"p{i + 1:04d}.png"
-        if not png.exists():
-            long_side_in = max(page.rect.width, page.rect.height) / 72
-            d = max(72, min(dpi, int(MAX_SIDE_PX / long_side_in)))
-            page.get_pixmap(dpi=d).save(str(png))
-        files.append(png)
-    return files
-
-
 def save_json(path: Path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1), "utf-8")
 
@@ -91,23 +97,9 @@ def upload_all(client: DSClient, page_files, files_json: Path, workers: int):
         print("[upload] input_mode=image_url; skip Files API", flush=True)
         return {str(i + 1): str(p) for i, p in enumerate(page_files)}
 
-    files_map = json.loads(files_json.read_text("utf-8")) if files_json.exists() else {}
-    todo = {i + 1: p for i, p in enumerate(page_files) if str(i + 1) not in files_map}
-    if not todo:
-        print(f"[upload] all {len(page_files)} pages already uploaded", flush=True)
-        return files_map
-
-    t0 = time.time()
-    done = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-        futs = {ex.submit(client.upload_image, str(p)): no for no, p in todo.items()}
-        for fut in concurrent.futures.as_completed(futs):
-            files_map[str(futs[fut])] = fut.result()
-            done += 1
-            if done % 20 == 0 or done == len(todo):
-                save_json(files_json, files_map)  # 边传边存，中断可续
-                print(f"[upload] {done}/{len(todo)} ({time.time() - t0:.0f}s)", flush=True)
-    return files_map
+    result = prepare_file_sources(client, page_files, files_json, workers)
+    print(f"[upload] {len(result)} file sources ready", flush=True)
+    return result
 
 
 def normalize_record(rec: dict, page: int) -> dict:
@@ -216,13 +208,61 @@ def split_auto_labels(labels: dict, ocr_engine=None) -> tuple[dict, dict]:
     return mac_labels, vlm_labels
 
 
-def cache_is_usable(old: dict, route: str, pages: int, ocr_engine=None) -> bool:
-    """判断已有索引是否与本次路由兼容。"""
+PIPELINE_SIGNATURE_VERSION = 2
+
+
+def build_pipeline_signature(route: str, ocr_engine=None, dpi: int = 150,
+                             model=None, base_url=None, input_mode=None) -> dict:
+    """生成索引缓存的处理链指纹。
+
+    参数：
+        route: ``auto``、``vision`` 或 ``text``。
+        ocr_engine: auto 路由使用的 OCR 引擎。
+        dpi: 页面渲染分辨率。
+        model/base_url/input_mode: VLM 的有效配置；显式值优先于环境变量。
+    返回值：
+        可直接写入 ``index.json`` 的稳定配置字典。
+    约束：
+        只解析配置，不创建客户端、不读取 API key、不发起网络请求。
+    """
+    if route not in ("auto", "vision", "text"):
+        raise ValueError(f"不支持的路由: {route}")
+    signature = {
+        "version": PIPELINE_SIGNATURE_VERSION,
+        "route": route,
+        "dpi": int(dpi),
+    }
+    if route == "text":
+        return signature
+    signature.update({
+        "model": resolve_model(model),
+        "base_url": resolve_base_url(base_url),
+        "input_mode": resolve_input_mode(input_mode),
+        # 修改索引提示词或转录协议时递增，避免静默复用旧文本。
+        "prompt_version": "2026-09-quality-1",
+    })
+    signature["ocr_engine"] = (
+        mac_ocr.resolve_ocr_engine(ocr_engine) if route == "auto" else None
+    )
+    return signature
+
+
+def cache_is_usable(old: dict, route: str, pages: int, ocr_engine=None,
+                    pipeline: dict | None = None) -> bool:
+    """判断已有索引是否与本次路由和处理链兼容。
+
+    ``pipeline`` 传入时必须与索引中的完整指纹一致；不传时保留旧调用的兼容行为。
+    """
     if old.get("pages_indexed", 0) < pages:
+        return False
+    if old.get("route") and old.get("route") != route:
         return False
     # auto 的引擎会改变 page_texts/source，旧索引（没有该字段）不能静默复用。
     if route == "auto" and old.get("ocr_engine") != ocr_engine:
         return False
+    if pipeline is not None:
+        if old.get("route") != route or old.get("pipeline") != pipeline:
+            return False
     return True
 
 
@@ -267,11 +307,20 @@ def main():
         mac_ocr.resolve_ocr_engine(args.ocr_engine)
         if args.route == "auto" else None
     )
+    pipeline_signature = build_pipeline_signature(
+        args.route,
+        selected_ocr_engine,
+        args.dpi,
+        model=args.model,
+        base_url=args.base_url,
+        input_mode=args.input_mode,
+    )
 
     if index_path.exists() and not args.force:
         try:
             old = json.loads(index_path.read_text("utf-8"))
-            if cache_is_usable(old, args.route, n_pages, selected_ocr_engine):
+            if cache_is_usable(old, args.route, n_pages, selected_ocr_engine,
+                               pipeline_signature):
                 print(f"[cache] index exists: {cache_dir}")
                 print(f"[cache] {old['pages_indexed']}/{old['total_pages']} pages indexed, use --force to rebuild")
                 return
@@ -290,8 +339,12 @@ def main():
 
     if args.route == "auto":
         # ---- 自适应：文本直录；SCAN/GARBLED 用 Mac OCR；TABLE/GRAPHIC 用 VLM ----
-        import router
-        from transcribe import transcribe_pages
+        try:
+            from . import router
+            from .transcribe import transcribe_pages
+        except ImportError:  # 兼容直接以脚本运行
+            import router
+            from transcribe import transcribe_pages
         # 先全量渲染 PNG（本地零成本）。transcribe 复用缓存里的图，且人式流程的
         # read_vision 需要任意候选页原图——若只渲染转录页，
         # TEXT/TABLE 候选页会缺 PNG（实测 NZME Q20 报错 p0035.png 不存在）。
@@ -354,6 +407,7 @@ def main():
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
             "route": "auto", "ocr_engine": selected_ocr_engine,
             "input_mode": client.input_mode if client is not None else None,
+            "pipeline": pipeline_signature,
             "transcription_pages": {
                 "mac_ocr": sorted(mac_texts),
                 "vlm": sorted(vlm_texts),
@@ -383,6 +437,7 @@ def main():
             "model": "text-layer", "created": datetime.now().isoformat(timespec="seconds"),
             "total_pages": total, "pages_indexed": n_pages, "partial": n_pages < total,
             "route": "text", "ocr_engine": None, "input_mode": None, "pages": ordered,
+            "pipeline": pipeline_signature,
             "page_texts": texts, "outline": [],
         }
         save_json(index_path, index)
@@ -426,6 +481,8 @@ def main():
         "model": client.model,
         "input_mode": client.input_mode,
         "ocr_engine": "vlm",
+        "route": "vision",
+        "pipeline": pipeline_signature,
         "created": datetime.now().isoformat(timespec="seconds"),
         "total_pages": total,
         "pages_indexed": n_pages,

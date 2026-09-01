@@ -10,6 +10,16 @@
   "model": "deepseek-v4-flash-vision-exp",
   "input_mode": "file",          // VLM 为 file/image_url；纯 Mac OCR 为 null
   "ocr_engine": "mac",            // auto 选择：mac 或 vlm
+  "pipeline": {                    // 处理链指纹，配置变化会使缓存失效
+    "version": 2,
+    "route": "auto",
+    "dpi": 150,
+    "model": "gpt-5.6-luna",
+    "base_url": "http://localhost:8317/v1",
+    "input_mode": "image_url",
+    "ocr_engine": "mac",
+    "prompt_version": "2026-09-quality-1"
+  },
   "created": "ISO 时间",
   "total_pages": 120,          // PDF 实际页数
   "pages_indexed": 120,        // 已索引页数（--limit 时小于 total_pages）
@@ -31,7 +41,9 @@
 
 同目录下：
 - `pages/p0001.png ...` —— 每页渲染图（150dpi，单边 ≤3600px）
+- `pages/.render-manifest.json` —— 每张 PNG 的请求/实际 DPI 与尺寸，防止复用旧分辨率
 - `files.json` —— 仅 `input_mode=file` 时生成：`{"1": "file-api-..."}` 页码 → Files API file_id（断点续传依据）
+- `.files-manifest.json` —— file_id 对应 PNG 的 SHA-256；复用前还会调用 `files.retrieve` 校验远端存在性
   `input_mode=image_url` 直接把本地 PNG 转成 data URL，不生成或读取该文件。
 
 ## 核心提示词
@@ -55,6 +67,8 @@
 ## 缓存与失效
 
 - 缓存键 = PDF 内容 sha256 前 16 位；PDF 改动即另起缓存。
+- 除 PDF 哈希外，索引还校验 route、模型、接口、图片模式、DPI、OCR 引擎和 prompt 版本；
+  任一处理链变化都会自动重建，不应静默复用旧结果。
 - `ingest.py --force` 重建索引（复用已上传文件）；`--clean` 删本地缓存。
 - Files API 文件默认永久有效；`file` 模式下 `read_vision` / `ingest` 上传前会校验 file_id，失效自动重传。
 - 想彻底清理服务端文件：`client.files.list()` 后对不再被任何 files.json 引用的

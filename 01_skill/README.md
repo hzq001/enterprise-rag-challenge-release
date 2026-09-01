@@ -31,7 +31,8 @@
 | `read_vision(pdf, page0, instr)` | **看图（你的眼睛）**：渲染该页，按你的指令提取 | 第 2 步，视觉查看 |
 | `read_text(pdf, page0)` | 快速瞄一眼文本层（零成本） | 先看文字再决定要不要看图 |
 | `search_pages(pdf, query)` | 辅助检索（带词干匹配） | 目录扫不到时兜底 |
-| `verify_quote(quote, evidence, kind, value)` | 自检：引用真实存在于页面 | 出答案前核验 |
+| `verify_quote(quote, evidence, kind, value, ...)` | 校验引用、数字符号与换算 | 细粒度核验 |
+| `verify_answer(answer, evidence)` | 校验结构化答案契约与页面证据 | 出答案前强制核验 |
 
 `read_vision` 内部通过 `scripts/ds_client.py`（可切换的视觉模型客户端）渲染并调用视觉模型。
 
@@ -47,7 +48,9 @@
 2. **视觉看页（`read_vision`）**——翻开那一页，按你构造的指令逐字读出相关内容、表格数字、图注。
    也可先用 `read_text` 瞄一眼文本层，再决定要不要看图。
 3. **深度查看**——没找到就换关键词再扫、翻邻页、找动词（appointed/resigned/effective）。
-4. **收敛**——找到了给答案 + 页码；穷尽目录与邻页仍无，明确说明查过哪里，再答 N/A。
+4. **收敛与核验**——找到了记录答案、raw_value、scale、单位、币种、期间、quote 和页码；
+   穷尽目录与邻页仍无，记录 `N/A`、`not_disclosed`、已检索关键词和页码，再调用
+   `verify_answer`。没有指标行不能填 0，只有明确出现 `0` 或 `—` 才能填 0。
 
 > boolean 题型最易失分：词出现 ≠ 事件发生。判定标尺——**必须有"变化"的证据**
 > （与去年对比的数字、报告期内实际完成的并购、明确发布的新产品、新设目标、股权注入），
@@ -137,8 +140,11 @@ deepseek-v4-flash-vision-rag/
 ├── SKILL.md                  # skill 入口：触发条件 + 人式工作流 + 决策规则 + 实测示范
 ├── README.md                # 本文件
 ├── scripts/
-│   ├── agentic_tools.py     # 人式工具集：scan_index / read_vision / read_text / search_pages / verify_quote
+│   ├── agentic_tools.py     # 人式工具集：scan_index / read_vision / read_text / search_pages / verify_answer
+│   ├── answer_quality.py     # 数字解析、披露状态与答案契约校验
 │   ├── ds_client.py         # 可切换模型和图片输入模式的 VLM 客户端
+│   ├── file_cache.py         # Files API ID 与本地 PNG 摘要校验/断点缓存
+│   ├── rendering.py         # 带 DPI 清单的 PDF 页面 PNG 缓存
 │   ├── mac_ocr.py            # Mac Vision OCR 的 Python 适配层
 │   ├── mac_ocr.swift         # Vision.framework OCR CLI
 │   ├── ingest.py            # 建索引（→ router + transcribe）；scan_index 的索引来源
@@ -151,8 +157,10 @@ deepseek-v4-flash-vision-rag/
 │   └── index-schema.md      # .cache 索引 JSON 结构、提示词、缓存机制
 └── .cache/                  # 预建索引（按 PDF 内容哈希分目录；scan_index 第 1 步优先查这里）
     └── <sha256前16位>/
-        ├── index.json        # 每页转录文本 page_texts + 页目录（type/headings/keywords/summary）+ 大纲
+        ├── index.json        # 每页转录文本、页目录、大纲与处理链指纹
         ├── files.json        # 仅 file 模式：页码 → Files API file_id 映射
+        ├── .files-manifest.json # file_id 对应 PNG 的 SHA-256
+        ├── pages/.render-manifest.json # PNG 的请求/实际 DPI 与尺寸
         └── pages/p0001.png   # 每页渲染图
 ```
 
