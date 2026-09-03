@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 VALID_NONES = ("N/A", "n/a", None, "")
@@ -75,23 +76,34 @@ def weight(gt_answers):
 
 
 def score(key: dict, sub: list):
+    """按官方口径评分：缺题计 0 分，但权重仍计入满分（与 rank.py 一致）。"""
     ours = {r["question_text"]: r for r in sub}
     total = ideal = 0.0
     per, detail = {}, []
     missing = [q for q in key if q not in ours]
     for q, v in key.items():
-        if q not in ours:
-            continue
         w = weight(v["answers"])
-        g = max(compare(v["kind"], gt, ours[q]["value"]) for gt in v["answers"])
-        total += g * w
         ideal += w
         d = per.setdefault(v["kind"], [0.0, 0.0, 0])
-        d[0] += g * w
         d[1] += w
         d[2] += 1
+        if q not in ours:
+            continue
+        g = max(compare(v["kind"], gt, ours[q]["value"]) for gt in v["answers"])
+        total += g * w
+        d[0] += g * w
         detail.append((q, v["kind"], v["answers"], ours[q]["value"], g, w))
     return total, ideal, per, detail, missing
+
+
+def load_json(path: Path, label: str):
+    """读取 JSON 输入，文件缺失或格式错误时给出可读错误并退出。"""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except OSError as e:
+        sys.exit(f"无法读取{label}文件: {path}（{e}）")
+    except json.JSONDecodeError as e:
+        sys.exit(f"{label}文件不是有效 JSON: {path}（第 {e.lineno} 行）")
 
 
 def main():
@@ -102,11 +114,15 @@ def main():
     ap.add_argument("--show-wrong", action="store_true", help="列出所有未满分的题")
     args = ap.parse_args()
 
-    key = json.loads(Path(args.key).read_text(encoding="utf-8"))
-    sub = json.loads(Path(args.submission).read_text(encoding="utf-8"))
+    key = load_json(Path(args.key), "答案键")
+    if not isinstance(key, dict) or not key:
+        sys.exit(f"答案键文件应为非空对象: {args.key}")
+    sub = load_json(Path(args.submission), "提交")
     if isinstance(sub, dict):                      # 兼容 {"answers": [...]} 提交格式
-        sub = sub.get("answers", [])
-    qs = json.loads(Path(args.questions).read_text(encoding="utf-8"))
+        sub = sub.get("answers")
+    if not isinstance(sub, list):
+        sys.exit(f"提交文件应为数组或 {{'answers': [...]}}: {args.submission}")
+    qs = load_json(Path(args.questions), "题集")
 
     total, ideal, per, detail, missing = score(key, sub)
     print(f"=== {Path(args.submission).name} ===")

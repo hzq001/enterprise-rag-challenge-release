@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "ports": {"preview": 3000, "additional": {}},
+  "scripts": {
+    "setup": {"enabled": true, "command": "python3 -m venv .venv && .venv/bin/python -m pip install -q openai pymupdf pdf-inspector && (command -v git-lfs >/dev/null 2>&1 || { sudo apt-get update -q && sudo apt-get install -y -q git-lfs; } || true)"},
+    "run": {"enabled": true, "command": null},
+    "archive": {"enabled": true, "command": null},
+    "check": {"enabled": true, "command": ".venv/bin/python -m unittest discover -s 01_skill/tests && .venv/bin/python -m unittest 04_评分.test_grade"}
+  },
+  "mcpServers": []
+}

@@ -74,20 +74,29 @@ def classify_pdf(pdf: Path, limit: int = 0):
     meta:       pdf-inspector 附加信息（表格页列表/乱码原因等）
     """
     warnings.filterwarnings("ignore")
-    import pdf_inspector
+    insp_pages, tbl_pages = {}, set()
+
+    # pdf-inspector 未安装或体检失败时都回退纯 PyMuPDF（导入必须在 try 内，
+    # 否则缺依赖直接抛 ModuleNotFoundError，走不到既有回退路径）。
+    try:
+        import pdf_inspector
+    except ImportError:
+        print("[router] 未安装 pdf-inspector，回退纯 PyMuPDF 分类 "
+              "（pip install pdf-inspector 可启用表格/乱码检测）", flush=True)
+        pdf_inspector = None
 
     doc = fitz.open(str(pdf))
     total = len(doc)
     n = min(total, limit) if limit > 0 else total
 
     # pdf-inspector 逐页体检
-    try:
-        res = pdf_inspector.extract_pages_markdown(str(pdf))
-        insp_pages = {pm.page + 1: pm for pm in getattr(res, "pages", [])}
-        tbl_pages = {t for t in (getattr(res, "pages_with_tables", None) or [])}
-    except Exception as e:
-        print(f"[router] pdf-inspector 失败，回退纯 PyMuPDF: {type(e).__name__}: {e}", flush=True)
-        insp_pages, tbl_pages = {}, set()
+    if pdf_inspector is not None:
+        try:
+            res = pdf_inspector.extract_pages_markdown(str(pdf))
+            insp_pages = {pm.page + 1: pm for pm in getattr(res, "pages", [])}
+            tbl_pages = {t for t in (getattr(res, "pages_with_tables", None) or [])}
+        except Exception as e:
+            print(f"[router] pdf-inspector 失败，回退纯 PyMuPDF: {type(e).__name__}: {e}", flush=True)
 
     labels, texts = {}, {}
     for i in range(n):

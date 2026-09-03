@@ -1,0 +1,8 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# skill 运行时产物：预建索引缓存（单份可达数百 MB，勿提交）与展示输出
+01_skill/.cache/
+pdf-vision-out/
